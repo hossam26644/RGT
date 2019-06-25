@@ -39,13 +39,13 @@ class Genotype():
                 '''if window detects a repeat unit, while it is not inside a repeat sequence'''
                 repeat = Repeat(sequence, i, window,repeat_units=self.repeat_units,
                                 unique_repeat_units_list=self.unique_repeat_units) #creat a repeat object
-                i = i+3 #Jumb one window
+                i = i+window_length #Jumb one window
                 continue
 
             elif self.detect_repeat_unit_inside_repeat(window, self.repeat_units, repeat):
                 '''if it detects a repeat while inside the repeat sequence'''
                 repeat.add_unit(window,i) #add a repeat unit count
-                i = i+3 #jumb one window
+                i = i+window_length #jumb one window
                 continue
 
             elif self.non_matching_unit_within_repeat(window, self.repeat_units, repeat):
