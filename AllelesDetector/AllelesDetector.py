@@ -8,7 +8,7 @@ class AllelesDetector():
 
         #sorted_geno_list: sorted by abundance, 2D list => list of lists(key index 0, value 1)
         self.sorted_geno_list = (sorted(geno_table.items(), key=lambda x: x[1][0], reverse=True))
-
+        self.color_code = ""
         self.counts_table = counts_table
         self.possible_alleles_list = self.get_possible_alleles_list_from_sorted_geno_list()  
         peak_identifier = PeakIdentifier(counts_table)
@@ -24,9 +24,11 @@ class AllelesDetector():
         #First case, when 2 matches identified
         if len(matching_sequences) == 2:
             message = "Heterozygous"
+            self.color_code = "green" 
             #check if an expanded allele exists
             if self.peaks_list_has_peaks_bigger_than_genotyped_alleles(matching_sequences):
                 message += " ,Peaks are found after expanded allele, please check manually "
+                self.color_code = "yellow"
            
             #check if the two matches have one count, this may mean that the peak is not a true peak
             #the peak could be the overlap of two peaks
@@ -37,12 +39,14 @@ class AllelesDetector():
                                 str(self.peak_repeat_counts)])
                 else:
                     neighbour_seq = self.get_neighbour_seq_if_it_is_an_allele(matching_sequences[0])
-                    if neighbour_seq != None :
+                    if neighbour_seq != None:
+                        self.color_code = "green" 
                         return([matching_sequences[0].sequence_string,neighbour_seq.sequence_string,
                             "Heterozygous", str(self.peak_repeat_counts)])
                     
 
                 message += " ,two matches with one repeat count, peak may not be a true peak, please check manually"
+                self.color_code = "red"
 
 
 
@@ -51,6 +55,7 @@ class AllelesDetector():
         
         #Second case, more than two matches, faulty read
         elif len(matching_sequences) >2:
+            self.color_code = "red"
             return([matching_sequences[0].sequence_string, matching_sequences[1].sequence_string,
                     "More than two potential alleles, please check manually", str(self.peak_repeat_counts)])
         
@@ -61,23 +66,29 @@ class AllelesDetector():
             neighbour_seq = self.get_neighbour_seq_if_it_is_an_allele(matching_sequences[0])
             #new_matching_sequences = self.check_if_the_next_repeat_is_an_allele(matching_sequences[0])
             if neighbour_seq != None :
+                self.color_code = "green"
                 return([matching_sequences[0].sequence_string,neighbour_seq.sequence_string,
                        "Heterozygous", str(self.peak_repeat_counts)])
             
             if self.peaks_list_has_peaks_bigger_than_genotyped_alleles(matching_sequences):
                 other_allele = self.get_seq_from_matching_peaks_more_than_counts_of(matching_sequences[0])
+                self.color_code = "yellow"
                 return([matching_sequences[0].sequence_string, other_allele.sequence_string,
-                       "Heterozygous, expanded allele detected with small count, please check", str(self.peak_repeat_counts)])
+                       "Heterozygous, expanded allele detected with small count, please check",
+                       str(self.peak_repeat_counts)])
 
             message = "Homozygous"
+            self.color_code = "green"
             if matching_sequences[0].repeat_units_count != self.possible_alleles_list[0][1][1]:
                 message += " ,most abundant repeat sequence not selected, please chek manually"
+                self.color_code = "red"
             return([matching_sequences[0].sequence_string, matching_sequences[0].sequence_string,
                 message, str(self.peak_repeat_counts)] )
         
         
         #Fourth case, no mathces are found
         elif len(matching_sequences) == 0:
+            self.color_code = "red"
             new_matching_sequences = self.explore_if_a_close_allele_exists()
             if len(new_matching_sequences)==2 :
                 return([new_matching_sequences[0].sequence_string ,new_matching_sequences[1].sequence_string,

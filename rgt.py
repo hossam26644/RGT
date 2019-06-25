@@ -18,7 +18,7 @@ class RGT():
     def rgt(self, sample):
         
         output_table = {} #dictionary to export result
-
+        color_table = {}
         #sample code chopping from file + directory name
         sample_code = sample.split("/")[-1]  #gets the last item after backslashes
         sample_code = sample_code.split(".")[0] #gets file name without extension
@@ -67,6 +67,7 @@ class RGT():
         output_table[sample_code] = a.get_alleles()
         output_table[sample_code].append(file.get_discarded_reads_percentage())
 
+        color_table[sample_code] = a.color_code
 
-        return(output_table)
+        return[output_table, color_table]
 

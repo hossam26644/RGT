@@ -24,13 +24,19 @@ def main():
 
     if number_of_threads == None:
         number_of_threads = cpu_count()
-    list_of_output_dictionaries = Parallel(n_jobs=number_of_threads,verbose=1)(map(delayed(rgt_.rgt),(samples)))
-    output_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(list_of_output_dictionaries)
+    result = Parallel(n_jobs=number_of_threads, verbose=1)(map(delayed(rgt_.rgt),(samples)))
+    
+    automated_genotyope = [i[0] for i in result]
+    color_table = [i[1] for i in result]
+    
+    output_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(automated_genotyope)
+    color_code_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(color_table)
 
     collective_excel_writer = ExcelWriter()
     results_headers = ["sample ID", "First allele structure", "Second allele structure",
                         "Comments and Flags", "Identified peaks", "Discarded reads percentage"]
-    collective_excel_writer.add_table_to_sheet(output_dictionary,"results", results_headers)
+    collective_excel_writer.add_table_to_sheet(output_dictionary,"results", results_headers,
+                            color_table=color_code_dictionary, colored_cell_index=4)
     collective_excel_writer.save_file(output_directory + "/ResultsSummary.xlsx")
 
 

@@ -10,8 +10,9 @@ class ExcelWriter():
         self.wb = Workbook()
         std = self.wb.get_sheet_by_name('Sheet')
         self.wb.remove_sheet(std)
+        self.color_codes = {"red":"EC7063", "green":"ABEBC6" , "yellow":"F9E79F", "blue":"d6eaf8"}
 
-    def add_table_to_sheet(self, table, sheet_name, header_list):
+    def add_table_to_sheet(self, table, sheet_name, header_list,color_table=None, colored_cell_index=None):
 
         ws = self.wb.create_sheet(sheet_name)
         ws.title = sheet_name
@@ -27,8 +28,16 @@ class ExcelWriter():
 
             else:   
                     ws.cell(row=row, column=2, value=table[key])
-
+            
+            if color_table != None:
+                color = color_table[key]
+                fill_style = PatternFill(fill_type='solid',
+                    start_color=self.color_codes[color])                
+                cell = ws.cell(row=row, column=colored_cell_index)
+                cell.fill = fill_style
+            
             row+=1
+
         self.cols_adjust_size(ws, header_list)
 
     def cols_adjust_size(self, ws, header_list):
@@ -44,7 +53,7 @@ class ExcelWriter():
     def write_table_header(self, ws, header_list):
 
         fill_style = PatternFill(fill_type='solid',
-                start_color='FFFF00')
+                start_color=self.color_codes["blue"])
       
         for idx, col_name in enumerate(header_list): #put the table header
             cell = ws.cell(row=1, column=1+idx, value=col_name)
