@@ -26,25 +26,23 @@ class AllelesDetector():
             message = "Heterozygous"
             #check if an expanded allele exists
             if self.peaks_list_has_peaks_bigger_than_genotyped_alleles(matching_sequences):
-                message += " ,expanded may exist, please check "
+                message += " ,Peaks are found after expanded allele, please check manually "
            
             #check if the two matches have one count, this may mean that the peak is not a true peak
             #the peak could be the overlap of two peaks
             if matching_sequences[0].repeat_units_count == matching_sequences[1].repeat_units_count:
-                #message += " ,two matches with one repeat count, please check manually"
                 if (matching_sequences[0].order_in_genotable == 1) and (matching_sequences[1].order_in_genotable == 2):
                     if matching_sequences[1].abundance >= 0.5* matching_sequences[0].abundance:
-                        message += " ,modified case 2"
                         return([matching_sequences[0].sequence_string,matching_sequences[1].sequence_string, message,
                                 str(self.peak_repeat_counts)])
                 else:
                     neighbour_seq = self.get_neighbour_seq_if_it_is_an_allele(matching_sequences[0])
                     if neighbour_seq != None :
                         return([matching_sequences[0].sequence_string,neighbour_seq.sequence_string,
-                            "ok hetero, alleles next to each other (The modified case ln1)", str(self.peak_repeat_counts)])
+                            "Heterozygous", str(self.peak_repeat_counts)])
                     
 
-                message += " ,two matches with one repeat count, please check manually"
+                message += " ,two matches with one repeat count, peak may not be a true peak, please check manually"
 
 
 
@@ -54,7 +52,7 @@ class AllelesDetector():
         #Second case, more than two matches, faulty read
         elif len(matching_sequences) >2:
             return([matching_sequences[0].sequence_string, matching_sequences[1].sequence_string,
-                    "check, more than two potential alleles >2", str(self.peak_repeat_counts)])
+                    "More than two potential alleles, please check manually", str(self.peak_repeat_counts)])
         
         #Third case, one peak is identified
         elif len(matching_sequences) == 1:
@@ -64,16 +62,16 @@ class AllelesDetector():
             #new_matching_sequences = self.check_if_the_next_repeat_is_an_allele(matching_sequences[0])
             if neighbour_seq != None :
                 return([matching_sequences[0].sequence_string,neighbour_seq.sequence_string,
-                       "ok hetero, alleles next to each other (The modified case ln2)", str(self.peak_repeat_counts)])
+                       "Heterozygous", str(self.peak_repeat_counts)])
             
             if self.peaks_list_has_peaks_bigger_than_genotyped_alleles(matching_sequences):
                 other_allele = self.get_seq_from_matching_peaks_more_than_counts_of(matching_sequences[0])
                 return([matching_sequences[0].sequence_string, other_allele.sequence_string,
-                       "expanded allele detected with small count, please check", str(self.peak_repeat_counts)])
+                       "Heterozygous, expanded allele detected with small count, please check", str(self.peak_repeat_counts)])
 
-            message = "ok homo"
+            message = "Homozygous"
             if matching_sequences[0].repeat_units_count != self.possible_alleles_list[0][1][1]:
-                message += " most abundant repeat sequence not selected, please chek manually"
+                message += " ,most abundant repeat sequence not selected, please chek manually"
             return([matching_sequences[0].sequence_string, matching_sequences[0].sequence_string,
                 message, str(self.peak_repeat_counts)] )
         
@@ -83,14 +81,14 @@ class AllelesDetector():
             new_matching_sequences = self.explore_if_a_close_allele_exists()
             if len(new_matching_sequences)==2 :
                 return([new_matching_sequences[0].sequence_string ,new_matching_sequences[1].sequence_string,
-                    "ok hetero, please check", str(self.peak_repeat_counts)])
+                    "Heterozygous, please check manually", str(self.peak_repeat_counts)])
             
             elif len(new_matching_sequences)==1:
                 return([new_matching_sequences[0].sequence_string , new_matching_sequences[0].sequence_string,
-                    "homo, please check" , str(self.peak_repeat_counts) ] )
+                    "Homozygous, please check manually" , str(self.peak_repeat_counts) ] )
            
             return([self.sorted_geno_list[0][1][0],self.sorted_geno_list[1][1][0],
-                "check no matching peaks", str(self.peak_repeat_counts) ])
+                "No possible alleles found, please check manually", str(self.peak_repeat_counts) ])
 
     def peaks_list_has_peaks_bigger_than_genotyped_alleles(self, matching_sequences):
 
