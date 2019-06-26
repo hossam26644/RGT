@@ -75,7 +75,7 @@ class RGT():
         return[output_table, color_table]
 
     def color_code_discarded_reads_percntg(self, color_table, prcntg,sample_code):
-        if prcntg>10:
+        if prcntg >= int(self.settings["discarded_reads_flag_percentage"]):
             this_sample_dict = color_table[sample_code]
             this_sample_dict[6] = "red"
 
