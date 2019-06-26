@@ -71,5 +71,4 @@ class ReadFile():
     def get_discarded_reads_percentage(self):
         percentage = self.number_of_discarded_reads / len(self.raw_reads)
         percentage *= 100
-        percentage = str(percentage) + "%"
         return percentage
