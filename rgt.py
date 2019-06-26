@@ -65,9 +65,17 @@ class RGT():
         #Automaticly detect allels from counts table and geom table
         a = AllelesDetector(sorted_counts_table,sorted_geno_table)
         output_table[sample_code] = a.get_alleles()
-        output_table[sample_code].append(file.get_discarded_reads_percentage())
+        discarded_reads_percentage = file.get_discarded_reads_percentage()
+        output_table[sample_code].append(str(discarded_reads_percentage)+"%")
+       
+        color_table[sample_code] = {4:a.color_code}
+        self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)
 
-        color_table[sample_code] = a.color_code
 
         return[output_table, color_table]
+
+    def color_code_discarded_reads_percntg(self, color_table, prcntg,sample_code):
+        if prcntg>10:
+            this_sample_dict = color_table[sample_code]
+            this_sample_dict[6] = "red"
 

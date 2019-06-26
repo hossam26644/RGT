@@ -30,16 +30,21 @@ class ExcelWriter():
                     ws.cell(row=row, column=2, value=table[key])
             
             if color_table != None:
-                color = color_table[key]
-                fill_style = PatternFill(fill_type='solid',
-                    start_color=self.color_codes[color])                
-                cell = ws.cell(row=row, column=colored_cell_index)
-                cell.fill = fill_style
+                self.apply_color_to_cells(ws, color_table[key],row)
             
             row+=1
 
         self.cols_adjust_size(ws, header_list)
 
+    def apply_color_to_cells(self,ws,sample_color_table,row):
+        for colored_cell_index in sample_color_table:
+            color = sample_color_table[colored_cell_index]
+            fill_style = PatternFill(fill_type='solid',
+                        start_color=self.color_codes[color])                
+            cell = ws.cell(row=row, column=colored_cell_index)
+            cell.fill = fill_style
+
+    
     def cols_adjust_size(self, ws, header_list):
         for idx, header in enumerate(header_list):
             size = len(header)+5
