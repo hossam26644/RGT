@@ -8,6 +8,14 @@ def extract_parameters(json_file):
         check_parameters(settings)
         return(settings)
 
+def get_bool_value_from_string(given_string):
+    if given_string in [0,"0","False","FALSE","false","no","No","NO","n","N" ]:
+        return False
+    elif given_string in [1,"1","True","TRUE","true", "yes","Yes","YES","y","Y"]:
+        return True
+    else:
+        raise ValueError("given input can not be determined")
+
 def check_parameters(settings):
     try:
         settings["repeat_units"]
@@ -44,7 +52,9 @@ def check_parameters(settings):
         settings["max_interrupt_tract"] = 5
 
     try:
-        settings["discard_reads_with_no_end_flank"] = distutils.util.strtobool((settings["discard_reads_with_no_end_flank"]))
+        settings["discard_reads_with_no_end_flank"]
+        settings["discard_reads_with_no_end_flank"] = get_bool_value_from_string(settings["discard_reads_with_no_end_flank"])
+        
     except Exception as e:
         settings["discard_reads_with_no_end_flank"] = False
     try:
