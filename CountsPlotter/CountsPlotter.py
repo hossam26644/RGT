@@ -6,7 +6,12 @@ class CountsPlotter():
     @staticmethod
     def plot_counts_table(counts_table, export_directory, sample_code):
         sorted_table = sorted(counts_table.items(),reverse=True)
-        x, y = zip(*sorted_table)
+        try:
+            x, y = zip(*sorted_table)
+
+        except ValueError as e:
+            x = [50]
+            y = [0]
         
         x_ticks_scaling_factor = (max(x)//40)+1
 
