@@ -31,7 +31,6 @@ def main():
     
     output_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(automated_genotyope)
     color_code_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(color_table)
-
     collective_excel_writer = ExcelWriter()
     results_headers = ["sample ID", "First allele structure", "Second allele structure",
                         "Comments and Flags", "Identified peaks", "Discarded reads percentage"]
