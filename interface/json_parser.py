@@ -46,7 +46,7 @@ def check_parameters(settings):
     try:
         settings["discard_reads_with_no_end_flank"] = distutils.util.strtobool((settings["discard_reads_with_no_end_flank"]))
     except Exception as e:
-        settings["discard_reads_with_no_end_flank"] = True
+        settings["discard_reads_with_no_end_flank"] = False
     try:
         int(settings["discarded_reads_flag_percentage"])
     except Exception as e:
