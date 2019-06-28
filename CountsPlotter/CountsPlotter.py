@@ -19,7 +19,8 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
         first_allele_index = x.index(first_allele.repeat_units_count)
         second_allele_index = x.index(second_allele.repeat_units_count)
         graph[first_allele_index].set_facecolor('r')
-        graph[second_allele_index].set_facecolor('#EC7063')
+        if first_allele != second_allele:
+            graph[second_allele_index].set_facecolor('#EC7063')
     except:
         pass
 
@@ -35,8 +36,12 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
     plt.ylabel("Number of reads" )
     try:
         ax = plt.gca()
-        ax.legend((graph[first_allele_index], graph[second_allele_index] ),
-            ([first_allele.sequence_string, second_allele.sequence_string]))
+        if first_allele != second_allele :
+            ax.legend((graph[first_allele_index], graph[second_allele_index] ),
+                ([first_allele.sequence_string, second_allele.sequence_string]),fontsize="xx-small")
+        else:
+            ax.legend((graph[first_allele_index],),
+               (first_allele.sequence_string,),fontsize="xx-small")
     except:
         pass
 
