@@ -15,9 +15,11 @@ class AllelesDetector():
         self.peak_repeat_counts = peak_identifier.get_peaks()
         self.plateau = 15 #plateau to ignore small peaks in the region of the detected allele,
                             #in the case of the expanded alleles
+        self.first_allele = None
+        self.second_allele = None
+        self.result_summery = self.predict_alleles()
 
-
-    def get_alleles(self):
+    def predict_alleles(self):
         matching_sequences = self.get_matches_between_peaks_and_possible_alleles_list()
 
 
@@ -35,12 +37,16 @@ class AllelesDetector():
             if matching_sequences[0].repeat_units_count == matching_sequences[1].repeat_units_count:
                 if (matching_sequences[0].order_in_genotable == 1) and (matching_sequences[1].order_in_genotable == 2):
                     if matching_sequences[1].abundance >= 0.5* matching_sequences[0].abundance:
+                        self.first_allele = matching_sequences[0]
+                        self.second_allele = matching_sequences[1]
                         return([matching_sequences[0].sequence_string,matching_sequences[1].sequence_string, message,
                                 str(self.peak_repeat_counts)])
                 else:
                     neighbour_seq = self.get_neighbour_seq_if_it_is_an_allele(matching_sequences[0])
                     if neighbour_seq != None:
                         self.color_code = "green" 
+                        self.first_allele = matching_sequences[0]
+                        self.second_allele = neighbour_seq
                         return([matching_sequences[0].sequence_string,neighbour_seq.sequence_string,
                             "Heterozygous", str(self.peak_repeat_counts)])
                     
@@ -48,14 +54,16 @@ class AllelesDetector():
                 message += " ,two matches with one repeat count, peak may not be a true peak, please check manually"
                 self.color_code = "red"
 
-
-
+            self.first_allele = matching_sequences[0]
+            self.second_allele = matching_sequences[1]
             return([matching_sequences[0].sequence_string,matching_sequences[1].sequence_string, message,
                     str(self.peak_repeat_counts)])
         
         #Second case, more than two matches, faulty read
         elif len(matching_sequences) >2:
             self.color_code = "red"
+            self.first_allele = matching_sequences[0]
+            self.second_allele = matching_sequences[1]            
             return([matching_sequences[0].sequence_string, matching_sequences[1].sequence_string,
                     "More than two potential alleles, please check manually", str(self.peak_repeat_counts)])
         
@@ -67,12 +75,16 @@ class AllelesDetector():
             #new_matching_sequences = self.check_if_the_next_repeat_is_an_allele(matching_sequences[0])
             if neighbour_seq != None :
                 self.color_code = "green"
+                self.first_allele = matching_sequences[0]
+                self.second_allele = neighbour_seq                
                 return([matching_sequences[0].sequence_string,neighbour_seq.sequence_string,
                        "Heterozygous", str(self.peak_repeat_counts)])
             
             if self.peaks_list_has_peaks_bigger_than_genotyped_alleles(matching_sequences):
                 other_allele = self.get_seq_from_matching_peaks_more_than_counts_of(matching_sequences[0])
                 self.color_code = "yellow"
+                self.first_allele = matching_sequences[0]
+                self.second_allele = other_allele              
                 return([matching_sequences[0].sequence_string, other_allele.sequence_string,
                        "Heterozygous, expanded allele detected with small count, please check",
                        str(self.peak_repeat_counts)])
@@ -82,6 +94,8 @@ class AllelesDetector():
             if matching_sequences[0].repeat_units_count != self.possible_alleles_list[0][1][1]:
                 message += " ,most abundant repeat sequence not selected, please chek manually"
                 self.color_code = "red"
+            self.first_allele = matching_sequences[0]
+            self.second_allele = other_allele                
             return([matching_sequences[0].sequence_string, matching_sequences[0].sequence_string,
                 message, str(self.peak_repeat_counts)] )
         
@@ -91,10 +105,14 @@ class AllelesDetector():
             self.color_code = "red"
             new_matching_sequences = self.explore_if_a_close_allele_exists()
             if len(new_matching_sequences)==2 :
+                self.first_allele = new_matching_sequences[0]
+                self.second_allele = new_matching_sequences[1]                
                 return([new_matching_sequences[0].sequence_string ,new_matching_sequences[1].sequence_string,
                     "Heterozygous, please check manually", str(self.peak_repeat_counts)])
             
             elif len(new_matching_sequences)==1:
+                self.first_allele = new_matching_sequences[0]
+                self.second_allele = new_matching_sequences[0]                
                 return([new_matching_sequences[0].sequence_string , new_matching_sequences[0].sequence_string,
                     "Homozygous, please check manually" , str(self.peak_repeat_counts) ] )
            
