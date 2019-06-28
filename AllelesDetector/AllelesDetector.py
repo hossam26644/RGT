@@ -95,7 +95,7 @@ class AllelesDetector():
                 message += " ,most abundant repeat sequence not selected, please chek manually"
                 self.color_code = "red"
             self.first_allele = matching_sequences[0]
-            self.second_allele = other_allele                
+            self.second_allele = matching_sequences[0]                
             return([matching_sequences[0].sequence_string, matching_sequences[0].sequence_string,
                 message, str(self.peak_repeat_counts)] )
         
