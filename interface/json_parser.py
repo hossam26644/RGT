@@ -61,3 +61,8 @@ def check_parameters(settings):
         int(settings["discarded_reads_flag_percentage"])
     except Exception as e:
         settings["discarded_reads_flag_percentage"] = 10
+    try:
+        settings["reverse_strand"]
+        settings["reverse_strand"] = get_bool_value_from_string(settings["reverse_strand"])
+    except Exception as e:
+        settings["reverse_strand"] = False

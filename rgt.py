@@ -36,7 +36,8 @@ class RGT():
                                 unique_repeat_units=self.settings["unique_repeat_units"],
                                 min_size_repeate=self.settings["min_size_repeate"],
                                 max_interrupt_tract=self.settings["max_interrupt_tract"],
-                                grouping_repeat_units=self.settings["grouping_repeat_units"])
+                                grouping_repeat_units=self.settings["grouping_repeat_units"],
+                                reverse_strand=self.settings["reverse_strand"])
 
             geno_table = genotype.get_geno_table() #the repeat sequence abundance table
             counts_table = genotype.get_counts_table() 
