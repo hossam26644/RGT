@@ -38,7 +38,8 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
         ax = plt.gca()
         if first_allele != second_allele :
             ax.legend((graph[first_allele_index], graph[second_allele_index] ),
-                ([first_allele.sequence_string, second_allele.sequence_string]), fontsize=4, borderaxespad=0, frameon=False)
+                ([first_allele.sequence_string, second_allele.sequence_string]),
+                 fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
         else:
             ax.legend((graph[first_allele_index],),
                (first_allele.sequence_string,),fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
