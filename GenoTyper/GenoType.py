@@ -37,7 +37,7 @@ class Genotype():
         i = window_length
         repeat = None
 
-        while i < len(sequence): #sliding window
+        while i <= len(sequence): #sliding window
             window = sequence[i-window_length:i]
             if self.window_enters_repeat_sequence(window, self.repeat_units, repeat):
                 '''if window detects a repeat unit, while it is not inside a repeat sequence'''
@@ -61,12 +61,11 @@ class Genotype():
                 #if length is larger than max interrupt tract
                 if repeat.number_of_units >= self.min_size_repeate: #check that number of repeates is larger than the minimum size repeate
                     self.add_repeat_to_tables(repeat)
-
                 repeat = None
             i +=1 
 
         if repeat != None and repeat.number_of_units >= self.min_size_repeate: #if sequence ends on a repeat
-            repeat.add_unit(window,i) #check properly
+            #repeat.add_unit(window,i) #check properly
             self.add_repeat_to_tables(repeat)
 
 
