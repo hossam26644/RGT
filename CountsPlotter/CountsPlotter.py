@@ -14,7 +14,7 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
     x_ticks_scaling_factor = (max(x)//40)+1
 
 
-    graph = plt.bar(x,y, align='center', alpha=0.5)
+    graph = plt.bar(x,y, align='center', alpha=0.65)
     try:
         first_allele_index = x.index(first_allele.repeat_units_count)
         second_allele_index = x.index(second_allele.repeat_units_count)
