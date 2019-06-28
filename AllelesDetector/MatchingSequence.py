@@ -7,3 +7,10 @@ class MatchingSequence():
         self.repeat_units_count = repeat_units_count
         self.abundance = abundance
         self.order_in_genotable = order+1 #idx starts from 1 not zero
+   
+    def __eq__(self, other): 
+        if not isinstance(other, MatchingSequence):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+
+        return self.sequence_string == other.sequence_string
