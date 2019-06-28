@@ -65,7 +65,6 @@ class Genotype():
             i +=1 
 
         if repeat != None and repeat.number_of_units >= self.min_size_repeate: #if sequence ends on a repeat
-            #repeat.add_unit(window,i) #check properly
             self.add_repeat_to_tables(repeat)
 
 
