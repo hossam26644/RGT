@@ -2,7 +2,7 @@ from FileReader.ReadFile import ReadFile
 from GenoTyper.GenoType import Genotype
 from ExcelExporter.ExcelExport import ExcelWriter
 from AllelesDetector.AllelesDetector import AllelesDetector
-from CountsPlotter.CountsPlotter import CountsPlotter
+from CountsPlotter.CountsPlotter import plot_counts_table
 
 import glob
 from joblib import Parallel, delayed, cpu_count
@@ -59,16 +59,17 @@ class RGT():
             excel_writer.add_table_to_sheet(sorted_unique_counts_table,"unique counts", counts_table_titles)
             excel_writer.save_file(self.output_directory + "/FilesSpecificResults/"+sample_code+".xlsx")
 
-            #export plot
-            table = genotype.get_counts_table()
-            CountsPlotter.plot_counts_table(table, self.output_directory+ "/Plots/"+sample_code+".png" , sample_code)
-
             #Automaticly detect allels from counts table and geom table
             a = AllelesDetector(sorted_counts_table,sorted_geno_table)
             output_table[sample_code] = a.result_summery
             discarded_reads_percentage = file.get_discarded_reads_percentage()
             output_table[sample_code].append(str(discarded_reads_percentage)+"%")
-           
+
+            #export plot
+            table = genotype.get_counts_table()
+            plot_directory = self.output_directory+ "/Plots/"+sample_code+".png"
+            plot_counts_table(table, plot_directory, sample_code, a.first_allele, a.second_allele)
+
             color_table[sample_code] = {4:a.color_code}
             self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)
 

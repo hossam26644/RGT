@@ -1,34 +1,45 @@
 '''docstring'''
 import matplotlib.pyplot as plt
 
-class CountsPlotter():
+def plot_counts_table(counts_table, export_directory, sample_code, first_allele, second_allele):
+    #print(first_allele.repeat_units_count)
+    sorted_table = sorted(counts_table.items(),reverse=True)
+    try:
+        x, y = zip(*sorted_table)
 
-    @staticmethod
-    def plot_counts_table(counts_table, export_directory, sample_code):
-        sorted_table = sorted(counts_table.items(),reverse=True)
-        try:
-            x, y = zip(*sorted_table)
-
-        except ValueError as e:
-            x = [50]
-            y = [0]
-        
-        x_ticks_scaling_factor = (max(x)//40)+1
+    except ValueError as e:
+        x = [50]
+        y = [0]
+    
+    x_ticks_scaling_factor = (max(x)//40)+1
 
 
-        graph = plt.bar(x,y, align='center', alpha=0.5)
-        plt.xticks(list(range(1,max(x),x_ticks_scaling_factor)),
-                   list(range(1,max(x),x_ticks_scaling_factor)),
-                   fontsize=6 , rotation=30, fontweight='medium' ) #4.5
-        
+    graph = plt.bar(x,y, align='center', alpha=0.5)
+    try:
+        first_allele_index = x.index(first_allele.repeat_units_count)
+        second_allele_index = x.index(second_allele.repeat_units_count)
+        graph[first_allele_index].set_facecolor('r')
+        graph[second_allele_index].set_facecolor('#EC7063')
+    except:
+        pass
 
-        plt.yticks(fontsize=6, fontweight='medium')
+    plt.xticks(list(range(1,max(x),x_ticks_scaling_factor)),
+               list(range(1,max(x),x_ticks_scaling_factor)),
+               fontsize=6 , rotation=30, fontweight='medium' ) #4.5
+    
 
-        plt.title(sample_code)
-        plt.xlabel("Total number of repeat units" )
-        plt.ylabel("Number of reads" )
+    plt.yticks(fontsize=6, fontweight='medium')
 
+    plt.title(sample_code)
+    plt.xlabel("Total number of repeat units" )
+    plt.ylabel("Number of reads" )
+    try:
+        ax = plt.gca()
+        ax.legend((graph[first_allele_index], graph[second_allele_index] ),
+            ([first_allele.sequence_string, second_allele.sequence_string]))
+    except:
+        pass
 
-        #plt.show()
-        plt.savefig(export_directory, dpi=600)
-        plt.clf()
+    
+    plt.savefig(export_directory, dpi=600)
+    plt.clf()
