@@ -11,6 +11,7 @@ class Genotype():
             self.repeat_units = get_rev_complementry(repeat_units)
         else:
             self.repeat_units = repeat_units
+        self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
         self.reads = reads
         self.min_size_repeate = min_size_repeate
         self.max_interrupt_tract = max_interrupt_tract + len(repeat_units[0])
@@ -148,3 +149,11 @@ class Genotype():
 
     def get_unique_counts_table(self):
         return self.unique_counts_table
+
+    def get_list_of_repeat_units_lengths(self):
+    	list_of_repeat_units_lengths =[]
+    	for unit in self.repeat_units:
+    		list_of_repeat_units_lengths.append(len(unit))
+    	list_of_repeat_units_lengths = set(list_of_repeat_units_lengths) #set removes repeats
+    	return(list(list_of_repeat_units_lengths))
+
