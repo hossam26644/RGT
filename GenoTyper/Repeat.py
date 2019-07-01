@@ -5,11 +5,11 @@ from .revComplementry import get_rev_complementry
 
 class Repeat():
     """docstring for Genotype"""
-    def __init__(self,read, last_unit_index,window, number_of_units=0, repeat_units=["CTG"], unique_repeat_units_list=None):
+    def __init__(self,read, start_index,window, number_of_units=0, repeat_units=["CTG"], unique_repeat_units_list=None):
         self.repeat_units = repeat_units
-        self.last_unit_index = last_unit_index
         self.number_of_units = number_of_units
-        self.start_index = last_unit_index - ((number_of_units+1)*len(repeat_units[0])) #for future use
+        self.last_unit_index = start_index + (len(window))
+        self.start_index = start_index 
         self.single_point_mutation_indexes = []
         self.unconfirmed_units_buffer = 0
         self.non_perfect_units = 0
@@ -17,7 +17,7 @@ class Repeat():
         self.unconfirmed_sequence = "" #sequence of non pure repeates waiting for a confirmed unit to  be added
         self.unique_repeat_units_list = unique_repeat_units_list
         self.unique_repeat_units_count = 0
-        self.add_unit(window, last_unit_index)
+        self.add_unit(window, self.last_unit_index)
         self.read = read
 
 

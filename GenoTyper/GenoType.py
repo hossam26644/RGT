@@ -14,7 +14,7 @@ class Genotype():
         self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
         self.reads = reads
         self.min_size_repeate = min_size_repeate
-        self.max_interrupt_tract = max_interrupt_tract + len(repeat_units[0])
+        self.max_interrupt_tract = max_interrupt_tract
         self.grouping_repeat_units = grouping_repeat_units
         self.geno_table = {}
         self.counts_table = {}
@@ -33,34 +33,36 @@ class Genotype():
 
 
     def get_line_repeates(self, sequence):
-        window_length = len(self.repeat_units[0])
 
-        i = window_length
+        i = 0
         repeat = None
 
-        while i <= len(sequence): #sliding window
-            window = sequence[i-window_length:i]
-            if self.window_enters_repeat_sequence(window, self.repeat_units, repeat):
+        while i <= len(sequence)-min(self.list_of_repeat_units_lengths): #sliding window
+            checker = self.window_enters_repeat_sequence(i, self.repeat_units, repeat, sequence)
+            if checker[0]:
                 '''if window detects a repeat unit, while it is not inside a repeat sequence'''
+                window = checker[1]
                 repeat = Repeat(sequence, i, window,repeat_units=self.repeat_units,
                                 unique_repeat_units_list=self.unique_repeat_units) #creat a repeat object
-                i = i+window_length #Jumb one window
+                i = i+len(window) #Jumb one window
                 continue
-
-            elif self.detect_repeat_unit_inside_repeat(window, self.repeat_units, repeat):
+            
+            checker = self.detect_repeat_unit_inside_repeat(i, self.repeat_units, repeat, sequence)
+            if checker[0]:
                 '''if it detects a repeat while inside the repeat sequence'''
-                repeat.add_unit(window,i) #add a repeat unit count
-                i = i+window_length #jumb one window
+                window = checker[1]
+                repeat.add_unit(window,i+len(window)) #add a repeat unit count
+                i = i+len(window) #jumb one window
                 continue
 
-            elif self.non_matching_unit_within_repeat(window, self.repeat_units, repeat):
+            elif self.non_matching_unit_within_repeat(i, self.repeat_units, repeat, sequence):
                 #print(window,i,repeat.last_unit_index, i-repeat.last_unit_index)
-                if i-repeat.last_unit_index <= self.max_interrupt_tract:
+                if i-repeat.last_unit_index < self.max_interrupt_tract:
                     #ignore if length is smaller than max interrupt tract
                     i += 1
                     continue
                 #if length is larger than max interrupt tract
-                if repeat.number_of_units >= self.min_size_repeate: #check that number of repeates is larger than the minimum size repeate
+                elif repeat.number_of_units >= self.min_size_repeate: #check that number of repeates is larger than the minimum size repeate
                     self.add_repeat_to_tables(repeat)
                 repeat = None
             i +=1 
@@ -70,40 +72,48 @@ class Genotype():
 
 
 
-
-    def non_matching_unit_within_repeat(self, window, repeat_units,  repeat_object):
+    def non_matching_unit_within_repeat(self,idx, repeat_units,  repeat_object,sequence):
         window_inside_repeates_flag = repeat_object != None
         if window_inside_repeates_flag:
-            for repeat_unit in repeat_units:
-                if self.is_window_equals_repeat_unit(window, repeat_unit, repeat_object):
-                    return False
-            return True 
-        return False   
-
-    def detect_repeat_unit_inside_repeat(self, window, repeat_units, repeat_object):
-        window_inside_repeates_flag = repeat_object != None
-        if window_inside_repeates_flag:
-            for repeat_unit in repeat_units:
-                if self.is_window_equals_repeat_unit(window, repeat_unit, repeat_object):
-                    return True
+            if self.do_repeat_unit_exist(idx,repeat_object,sequence)[0]:
+                return False
+            return True  
         return False
 
-    def window_enters_repeat_sequence(self, window, repeat_units, repeat_object): 
+    def detect_repeat_unit_inside_repeat(self,idx, repeat_units, repeat_object, sequence):
+        window_inside_repeates_flag = repeat_object != None
+        if window_inside_repeates_flag:
+            checker = self.do_repeat_unit_exist(idx,repeat_object,sequence)
+            if checker[0]:
+                return True, checker[1]
+        return False, ""
+
+    def window_enters_repeat_sequence(self,idx, repeat_units, repeat_object,sequence): 
         window_inside_repeates_flag = repeat_object != None
         if not window_inside_repeates_flag:
-            for repeat_unit in repeat_units:
-                if self.is_window_equals_repeat_unit(window, repeat_unit, repeat_object):
-                    return True
-        return False
+            checker = self.do_repeat_unit_exist(idx,repeat_object,sequence)
+            if checker[0]:
+                return True, checker[1]
+        return False, ""
 
-    def is_window_equals_repeat_unit(self, window, repeat_unit, repeat_object):
-        mismatch = False
-        for i in range(0,len(window)):
-            if (window[i] != repeat_unit[i]) and (not mismatch) and (repeat_object != None):
-                mismatch = True
-            elif (window[i] != repeat_unit[i]) and (mismatch or repeat_object == None):
-                return False
-        return True
+    def do_repeat_unit_exist(self,idx,repeat_object,sequence):
+        similar_seq = ""
+        for length in self.list_of_repeat_units_lengths:
+            window = sequence[idx:idx+length]
+            for repeat_unit in self.repeat_units:
+                if window == repeat_unit:
+                    return True, window
+                elif repeat_object != None and self.hamming_distance(window, repeat_unit)==1:
+                    if similar_seq == "":
+                        similar_seq = window
+        if similar_seq != "":
+            return True, similar_seq
+        return False, ""
+
+    def hamming_distance(self,s1, s2):
+        if len(s1) != len(s2):
+            return -1
+        return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
     def add_repeat_to_tables(self, repeat):
         self.add_repeat_to_genotable(repeat)
@@ -151,9 +161,11 @@ class Genotype():
         return self.unique_counts_table
 
     def get_list_of_repeat_units_lengths(self):
-    	list_of_repeat_units_lengths =[]
-    	for unit in self.repeat_units:
-    		list_of_repeat_units_lengths.append(len(unit))
-    	list_of_repeat_units_lengths = set(list_of_repeat_units_lengths) #set removes repeats
-    	return(list(list_of_repeat_units_lengths))
-
+        list_of_repeat_units_lengths =[]
+        for unit in self.repeat_units:
+            list_of_repeat_units_lengths.append(len(unit))
+        list_of_repeat_units_lengths = set(list_of_repeat_units_lengths) #set removes repeats
+        list_of_repeat_units_lengths = list(list_of_repeat_units_lengths) #making lenghts a list
+        list_of_repeat_units_lengths.sort(reverse = True) #sort descendingly
+       
+        return(list_of_repeat_units_lengths)
