@@ -68,7 +68,8 @@ class RGT():
             #export plot
             table = genotype.get_counts_table()
             plot_directory = self.output_directory+ "/Plots/"+sample_code+".png"
-            plot_counts_table(table, plot_directory, sample_code, a.first_allele, a.second_allele)
+            plot_counts_table(table, plot_directory, sample_code,
+                    a.first_allele, a.second_allele, color_code=a.color_code)
 
             color_table[sample_code] = {4:a.color_code}
             self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)

@@ -1,8 +1,9 @@
 '''docstring'''
 import matplotlib.pyplot as plt
 
-def plot_counts_table(counts_table, export_directory, sample_code, first_allele, second_allele):
+def plot_counts_table(counts_table, export_directory, sample_code, first_allele, second_allele, color_code='black'):
     #print(first_allele.repeat_units_count)
+    color_codes = {"red":"r", "green":"g" , "yellow":"orange", "black":"k"}
     sorted_table = sorted(counts_table.items(),reverse=True)
     try:
         x, y = zip(*sorted_table)
@@ -31,7 +32,7 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
 
     plt.yticks(fontsize=6, fontweight='medium')
 
-    plt.title(sample_code)
+    plt.title(sample_code, color=color_codes[color_code])
     plt.xlabel("Total number of repeat units" )
     plt.ylabel("Number of reads" )
     try:
