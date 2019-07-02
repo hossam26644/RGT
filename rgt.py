@@ -60,7 +60,7 @@ class RGT():
             excel_writer.save_file(self.output_directory + "/FilesSpecificResults/"+sample_code+".xlsx")
 
             #Automaticly detect allels from counts table and geom table
-            a = AllelesDetector(sorted_counts_table,sorted_geno_table)
+            a = AllelesDetector(sorted_counts_table, sorted_geno_table, self.settings["minimum_no_of_reads"])
             output_table[sample_code] = a.result_summery
             discarded_reads_percentage = file.get_discarded_reads_percentage()
             output_table[sample_code].append(str(discarded_reads_percentage)+"%")

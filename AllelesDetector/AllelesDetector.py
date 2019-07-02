@@ -4,7 +4,7 @@ from .MatchingSequence import MatchingSequence
 
 class AllelesDetector():
     """docstring for main"""
-    def __init__(self, counts_table, geno_table):
+    def __init__(self, counts_table, geno_table, minimum_no_of_reads):
 
         #sorted_geno_list: sorted by abundance, 2D list => list of lists(key index 0, value 1)
         self.sorted_geno_list = (sorted(geno_table.items(), key=lambda x: x[1][0], reverse=True))
@@ -18,6 +18,9 @@ class AllelesDetector():
         self.first_allele = None
         self.second_allele = None
         self.result_summery = self.predict_alleles()
+        if self.first_allele.repeat_units_count < minimum_no_of_reads:
+            self.color_code = "red"
+            self.result_summery[2] = "Number of reads is lower than threshold"
 
     def predict_alleles(self):
         matching_sequences = self.get_matches_between_peaks_and_possible_alleles_list()

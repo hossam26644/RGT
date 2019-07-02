@@ -66,3 +66,8 @@ def check_parameters(settings):
         settings["reverse_strand"] = get_bool_value_from_string(settings["reverse_strand"])
     except Exception as e:
         settings["reverse_strand"] = False
+    try:
+    	settings["minimum_no_of_reads"]
+    except Exception as e:
+    	settings["minimum_no_of_reads"] = 30
+    print(settings)
