@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 def plot_counts_table(counts_table, export_directory, sample_code, first_allele, second_allele, color_code='black'):
-    #print(first_allele.repeat_units_count)
+
     color_codes = {"red":"r", "green":"g" , "yellow":"orange", "black":"k"}
     sorted_table = sorted(counts_table.items(),reverse=True)
     try:
@@ -22,12 +22,14 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
         first_allele_index = x.index(first_allele.repeat_units_count) 
         second_allele_index = x.index(second_allele.repeat_units_count)
         
+        #color the bars that correspond to the alleles
         graph[second_allele_index].set_facecolor('#EC7063')
         graph[first_allele_index].set_facecolor('r')
         
     except:
         pass
 
+    # manipulating the xticks, font, rotation,and step
     plt.xticks(list(range(1,max(x),x_ticks_scaling_factor)),
                list(range(1,max(x),x_ticks_scaling_factor)),
                fontsize=6 , rotation=30, fontweight='medium' ) #4.5
@@ -38,7 +40,8 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
     plt.title(sample_code, color=color_codes[color_code])
     plt.xlabel("Total number of repeat units" )
     plt.ylabel("Number of reads" )
-    try:
+    
+    try: #all the hassle in this try is to put the legend
         ax = plt.gca()
         if first_allele != second_allele : #heterozygous
             if first_allele_index == second_allele_index:
