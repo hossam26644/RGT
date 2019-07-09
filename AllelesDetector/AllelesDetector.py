@@ -64,7 +64,9 @@ class AllelesDetector():
         elif len(matching_sequences) >2:
             self.color_code = "red"
             self.first_allele = matching_sequences[0]
-            self.second_allele = matching_sequences[1]            
+            self.second_allele = matching_sequences[1] 
+            for matching_sequence in (matching_sequences):
+                print(matching_sequence.sequence_string)
             return([matching_sequences[0].sequence_string, matching_sequences[1].sequence_string,
                     "More than two potential alleles, please check manually", str(self.peak_repeat_counts)])
         
@@ -155,7 +157,8 @@ class AllelesDetector():
     def get_seq_possible_alleles_list_by_repeats_count(self, count, given_list):
         for idx, possibe_allele in enumerate(given_list):
             if (possibe_allele[1][1]) == count:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0], idx)
+                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
+                                idx, possibe_allele[1][2] )
                 return matching_sequence
         return None
 
@@ -166,9 +169,10 @@ class AllelesDetector():
         
         for idx, possibe_allele in enumerate(self.sorted_geno_list):
             if (possibe_allele[1][1]) in repeat_counts_bigger_than_detected_allele:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0], idx)
+                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
+                    idx, possibe_allele[1][2])
                 return matching_sequence
-        return MatchingSequence("can't find the other allele", 0, 0, 0) #this line should be impossible to reach
+        return MatchingSequence("can't find the other allele", 0, 0, 0, 0) #this line should be impossible to reach
 
 
     def explore_if_a_close_allele_exists(self):
@@ -190,7 +194,8 @@ class AllelesDetector():
         #checking if a match happens with the near by points, now identified as new peaks
         for idx, possibe_allele in enumerate(self.possible_alleles_list):
             if (possibe_allele[1][1]) in new_peak_repeat_counts:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0], idx)
+                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
+                                idx, possibe_allele[1][2])
                 new_matching_sequences.append(matching_sequence)
         return new_matching_sequences
         
@@ -199,7 +204,8 @@ class AllelesDetector():
         matching_sequences = []
         for idx, possibe_allele in enumerate(self.possible_alleles_list):
             if possibe_allele[1][1] in self.peak_repeat_counts:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0], idx)
+                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
+                                idx, possibe_allele[1][2])
                 matching_sequences.append(matching_sequence)
         return matching_sequences
     

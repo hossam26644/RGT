@@ -31,7 +31,13 @@ def check_or_create_output_directory(output_directory):
             sys.exit()
 
     if not os.path.isdir(output_directory + "/Plots"):
-            os.mkdir(output_directory +"/Plots")
+        os.mkdir(output_directory +"/Plots")
+        
+    if not (os.path.isdir(output_directory + "/Plots/total-counts-plots/") and
+             os.path.isdir(output_directory + "/Plots/specified-units-count-plots/")):
+            
+            os.mkdir(output_directory +"/Plots/total-counts-plots/")
+            os.mkdir(output_directory +"/Plots/specified-units-count-plots/")
             print("Plots directory created inside output directory")
 
     if not os.path.isdir(output_directory + "/FilesSpecificResults"):

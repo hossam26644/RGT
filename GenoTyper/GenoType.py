@@ -9,6 +9,7 @@ class Genotype():
         self.reverse_strand = reverse_strand
         if self.reverse_strand:
             self.repeat_units = get_rev_complementry(repeat_units)
+            self.unique_repeat_units = get_rev_complementry(unique_repeat_units)
         else:
             self.repeat_units = repeat_units
         self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
@@ -19,10 +20,6 @@ class Genotype():
         self.geno_table = {}
         self.counts_table = {}
         self.unique_counts_table = {}
-        if unique_repeat_units == None:
-            self.unique_repeat_units = self.repeat_units
-        else:
-            self.unique_repeat_units = unique_repeat_units
 
         self.get_repeates()
 

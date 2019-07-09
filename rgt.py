@@ -66,7 +66,7 @@ class RGT():
             output_table[sample_code].append(str(round(discarded_reads_percentage, 1)))
 
             #export plot
-            plot_graphs(genotype,self.output_directory, sample_code, a.first_allele, a.second_allele, a.color_code)
+            plot_graphs(self.settings, genotype,self.output_directory, sample_code, a.first_allele, a.second_allele, a.color_code)
 
             color_table[sample_code] = {4:a.color_code}
             self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)

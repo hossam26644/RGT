@@ -1,10 +1,11 @@
 '''docstring'''
 import matplotlib.pyplot as plt
 
-def plot_2d_table(counts_table, export_directory, sample_code, first_allele, second_allele, color_code='black'):
+def plot_2d_table(table, export_directory, sample_code, first_allele, second_allele,
+                first_allele_count, second_allele_count,xlabel, color_code='black'):
 
     color_codes = {"red":"r", "green":"g" , "yellow":"orange", "black":"k"}
-    sorted_table = sorted(counts_table.items(),reverse=True)
+    sorted_table = sorted(table.items(),reverse=True)
     try:
         x, y = zip(*sorted_table)
 
@@ -19,8 +20,8 @@ def plot_2d_table(counts_table, export_directory, sample_code, first_allele, sec
     
     try:
         #get the index of the alleles in the x data
-        first_allele_index = x.index(first_allele.repeat_units_count) 
-        second_allele_index = x.index(second_allele.repeat_units_count)
+        first_allele_index = x.index(first_allele_count) 
+        second_allele_index = x.index(second_allele_count)
         
         #color the bars that correspond to the alleles
         graph[second_allele_index].set_facecolor('#EC7063')
@@ -38,7 +39,7 @@ def plot_2d_table(counts_table, export_directory, sample_code, first_allele, sec
     plt.yticks(fontsize=6, fontweight='medium')
 
     plt.title(sample_code, color=color_codes[color_code])
-    plt.xlabel("Total number of repeat units" )
+    plt.xlabel(xlabel)
     plt.ylabel("Number of reads" )
     
     try: #all the hassle in this try is to put the legend
