@@ -2,7 +2,7 @@ from FileReader.ReadFile import ReadFile
 from GenoTyper.GenoType import Genotype
 from ExcelExporter.ExcelExport import ExcelWriter
 from AllelesDetector.AllelesDetector import AllelesDetector
-from CountsPlotter.CountsPlotter import plot_counts_table
+from graphsplotter.plotter import plot_graphs
 
 import glob
 from joblib import Parallel, delayed, cpu_count
@@ -66,10 +66,7 @@ class RGT():
             output_table[sample_code].append(str(round(discarded_reads_percentage, 1)))
 
             #export plot
-            table = genotype.get_counts_table()
-            plot_directory = self.output_directory+ "/Plots/"+sample_code+".png"
-            plot_counts_table(table, plot_directory, sample_code,
-                    a.first_allele, a.second_allele, color_code=a.color_code)
+            plot_graphs(genotype,self.output_directory, sample_code, a.first_allele, a.second_allele, a.color_code)
 
             color_table[sample_code] = {4:a.color_code}
             self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)
