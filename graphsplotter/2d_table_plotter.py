@@ -1,7 +1,7 @@
 '''docstring'''
 import matplotlib.pyplot as plt
 
-def plot_counts_table(counts_table, export_directory, sample_code, first_allele, second_allele, color_code='black'):
+def plot_2d_table(counts_table, export_directory, sample_code, first_allele, second_allele, color_code='black'):
 
     color_codes = {"red":"r", "green":"g" , "yellow":"orange", "black":"k"}
     sorted_table = sorted(counts_table.items(),reverse=True)
