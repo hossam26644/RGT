@@ -37,11 +37,24 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
     plt.ylabel("Number of reads" )
     try:
         ax = plt.gca()
-        if first_allele != second_allele :
-            ax.legend((graph[first_allele_index], graph[second_allele_index] ),
-                ([first_allele.sequence_string, second_allele.sequence_string]),
-                 fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
-        else:
+        if first_allele != second_allele : #heterozygous
+            if first_allele_index == second_allele_index:
+                
+                two_alleles_counts = first_allele.abundance + second_allele.abundance
+                first_allele_percentage = first_allele.abundance / two_alleles_counts
+                second_allele_percentage = second_allele.abundance / two_alleles_counts
+
+                first_legend_string = first_allele.sequence_string +" ("+ str(round(first_allele_percentage, 1)*100) + "%)" 
+                second_legend_string = second_allele.sequence_string +" ("+ str(round(second_allele_percentage, 1)*100) + "%)"
+                
+                ax.legend((graph[first_allele_index], graph[second_allele_index] ),
+                    ([first_legend_string, second_legend_string]),
+                     fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
+            else:
+                ax.legend((graph[first_allele_index], graph[second_allele_index] ),
+                    ([first_allele.sequence_string, second_allele.sequence_string]),
+                     fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
+        else: #homozygous
             ax.legend((graph[first_allele_index],),
                (first_allele.sequence_string,),fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
     except:
