@@ -8,20 +8,23 @@ def plot_counts_table(counts_table, export_directory, sample_code, first_allele,
     try:
         x, y = zip(*sorted_table)
 
-    except ValueError as e:
+    except ValueError as e: #when the counts table is empty, plot an empty plot
         x = [50]
         y = [0]
     
-    x_ticks_scaling_factor = (max(x)//40)+1
+    x_ticks_scaling_factor = (max(x)//40)+1 # scale the number of x-ticks to avoid their overlap 
 
 
     graph = plt.bar(x,y, align='center', alpha=0.65)
+    
     try:
-        first_allele_index = x.index(first_allele.repeat_units_count)
+        #get the index of the alleles in the x data
+        first_allele_index = x.index(first_allele.repeat_units_count) 
         second_allele_index = x.index(second_allele.repeat_units_count)
+        
+        graph[second_allele_index].set_facecolor('#EC7063')
         graph[first_allele_index].set_facecolor('r')
-        if first_allele != second_allele:
-            graph[second_allele_index].set_facecolor('#EC7063')
+        
     except:
         pass
 
