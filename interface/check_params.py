@@ -33,16 +33,15 @@ def check_or_create_output_directory(output_directory):
     if not os.path.isdir(output_directory + "/Plots"):
         os.mkdir(output_directory +"/Plots")
         
-    if not (os.path.isdir(output_directory + "/Plots/total-counts-plots/") and
-             os.path.isdir(output_directory + "/Plots/specified-units-count-plots/")):
-            
-            os.mkdir(output_directory +"/Plots/total-counts-plots/")
-            os.mkdir(output_directory +"/Plots/specified-units-count-plots/")
-            print("Plots directory created inside output directory")
+    if not os.path.isdir(output_directory + "/Plots/total-counts-plots/"):
+        os.mkdir(output_directory +"/Plots/total-counts-plots/")
+    if not os.path.isdir(output_directory + "/Plots/specified-units-count-plots/"):
+        os.mkdir(output_directory +"/Plots/specified-units-count-plots/")
+    if not os.path.isdir(output_directory + "/Plots/3d_plots/"):
+        os.mkdir(output_directory +"/Plots/3d_plots/")
 
     if not os.path.isdir(output_directory + "/FilesSpecificResults"):
             os.mkdir(output_directory +"/FilesSpecificResults")
-            print("FilesSpecificResults created inside output directory")
 
 def check_settings_file(settings_file):
     if not os.path.exists(settings_file):

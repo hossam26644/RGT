@@ -158,7 +158,7 @@ class AllelesDetector():
         for idx, possibe_allele in enumerate(given_list):
             if (possibe_allele[1][1]) == count:
                 matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                                idx, possibe_allele[1][2] )
+                                idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4] )
                 return matching_sequence
         return None
 
@@ -170,7 +170,7 @@ class AllelesDetector():
         for idx, possibe_allele in enumerate(self.sorted_geno_list):
             if (possibe_allele[1][1]) in repeat_counts_bigger_than_detected_allele:
                 matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                    idx, possibe_allele[1][2])
+                    idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4])
                 return matching_sequence
         return MatchingSequence("can't find the other allele", 0, 0, 0, 0) #this line should be impossible to reach
 
@@ -195,7 +195,7 @@ class AllelesDetector():
         for idx, possibe_allele in enumerate(self.possible_alleles_list):
             if (possibe_allele[1][1]) in new_peak_repeat_counts:
                 matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                                idx, possibe_allele[1][2])
+                                idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4])
                 new_matching_sequences.append(matching_sequence)
         return new_matching_sequences
         
@@ -205,7 +205,7 @@ class AllelesDetector():
         for idx, possibe_allele in enumerate(self.possible_alleles_list):
             if possibe_allele[1][1] in self.peak_repeat_counts:
                 matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                                idx, possibe_allele[1][2])
+                                idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4])
                 matching_sequences.append(matching_sequence)
         return matching_sequences
     

@@ -1,25 +1,47 @@
 '''docstring'''
 from .Repeat import Repeat
 from .revComplementry import get_rev_complementry
+import copy
 
 class Genotype():
     """docstring for Genotype"""
-    def __init__(self, reads, repeat_units=["CAG","CAA","CCG", "CCA","CCT"], min_size_repeate=5,
-                max_interrupt_tract=5, unique_repeat_units=None, grouping_repeat_units=None, reverse_strand=False):
-        self.reverse_strand = reverse_strand
+    def __init__(self, reads, settings):
+        self.settings =  copy.deepcopy(settings)
+        self.reverse_strand = settings["reverse_strand"]
         if self.reverse_strand:
-            self.repeat_units = get_rev_complementry(repeat_units)
-            self.unique_repeat_units = get_rev_complementry(unique_repeat_units)
+            self.repeat_units = get_rev_complementry(self.settings["repeat_units"])
+            self.unique_repeat_units = get_rev_complementry(self.settings["unique_repeat_units"])
+           
+            if self.settings["3D_plot_parameters"]!= None:
+                for key in self.settings["3D_plot_parameters"]:
+                    try:
+                        self.settings["3D_plot_parameters"][key] = get_rev_complementry(
+                            self.settings["3D_plot_parameters"][key])
+                    except Exception as e:
+                        pass
+                temp = self.settings["3D_plot_parameters"]["before_x_seq"]
+                self.settings["3D_plot_parameters"]["before_x_seq"] = self.settings["3D_plot_parameters"]["after_x_seq"]
+
+                self.settings["3D_plot_parameters"]["after_x_seq"] = temp
+                
+                temp = self.settings["3D_plot_parameters"]["before_z_seq"]
+                self.settings["3D_plot_parameters"]["before_z_seq"] = self.settings["3D_plot_parameters"]["after_z_seq"]
+
+                self.settings["3D_plot_parameters"]["after_z_seq"] = temp
+
+
         else:
-            self.repeat_units = repeat_units
+            self.repeat_units = self.settings["repeat_units"]
         self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
         self.reads = reads
-        self.min_size_repeate = min_size_repeate
-        self.max_interrupt_tract = max_interrupt_tract
-        self.grouping_repeat_units = grouping_repeat_units
+        self.min_size_repeate = self.settings["min_size_repeate"]
+        self.max_interrupt_tract = self.settings["max_interrupt_tract"]
+        self.grouping_repeat_units = self.settings["grouping_repeat_units"]
+        self.plot_3d_settings = self.settings["3D_plot_parameters"]
         self.geno_table = {}
         self.counts_table = {}
         self.unique_counts_table = {}
+        self.table_3d = {}
 
         self.get_repeates()
 
@@ -40,7 +62,8 @@ class Genotype():
                 '''if window detects a repeat unit, while it is not inside a repeat sequence'''
                 window = checker[1]
                 repeat = Repeat(sequence, i, window,repeat_units=self.repeat_units,
-                                unique_repeat_units_list=self.unique_repeat_units) #creat a repeat object
+                                plot_3d_settings=self.plot_3d_settings,
+                                unique_repeat_units_list=self.unique_repeat_units,) #creat a repeat object
                 i = i+len(window) #Jumb one window
                 continue
             
@@ -116,7 +139,18 @@ class Genotype():
         self.add_repeat_to_genotable(repeat)
         self.add_repeat_to_countstable(repeat)
         self.add_repeat_to_unique_countstable(repeat)
+        if self.settings["3D_plot_parameters"]!= None:
+            self.add_repeat_to_table3d(repeat)
 
+    def add_repeat_to_table3d(self, repeat):
+        if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
+            key = (repeat.x_counts_for_3d, repeat.z_counts_for_3d)
+            if key in self.table_3d:
+               self.table_3d[key] += 1
+            else:
+                self.table_3d[key] = 1
+
+    
     def add_repeat_to_genotable(self, repeat):
         if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
             if self.grouping_repeat_units == None:
@@ -127,8 +161,16 @@ class Genotype():
             if(repeat_sequence in self.geno_table):
                 self.geno_table[repeat_sequence][0] += 1
             else:
-                self.geno_table[repeat_sequence] = [1,repeat.number_of_units,repeat.unique_repeat_units_count,repeat.get_seq()]
-   
+                if self.settings["3D_plot_parameters"]!= None:
+                    self.geno_table[repeat_sequence] = [1,repeat.number_of_units,
+                        repeat.x_counts_for_3d, repeat.z_counts_for_3d,
+                        repeat.unique_repeat_units_count,repeat.get_seq()]
+                else:
+                    self.geno_table[repeat_sequence] = [1,repeat.number_of_units,
+                        "not applicable", "not applicable",
+                        repeat.unique_repeat_units_count,repeat.get_seq()]
+
+       
     def add_repeat_to_countstable(self, repeat):
         if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
             number_of_repeat_units = repeat.number_of_units

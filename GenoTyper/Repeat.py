@@ -5,7 +5,9 @@ from .revComplementry import get_rev_complementry
 
 class Repeat():
     """docstring for Genotype"""
-    def __init__(self,read, start_index,window, number_of_units=0, repeat_units=["CTG"], unique_repeat_units_list=None):
+    def __init__(self,read, start_index,window, plot_3d_settings=None, number_of_units=0,
+            repeat_units=["CTG"], unique_repeat_units_list=None):
+        
         self.repeat_units = repeat_units
         self.number_of_units = number_of_units
         self.last_unit_index = start_index + (len(window))
@@ -17,8 +19,27 @@ class Repeat():
         self.unconfirmed_sequence = "" #sequence of non pure repeates waiting for a confirmed unit to  be added
         self.unique_repeat_units_list = unique_repeat_units_list
         self.unique_repeat_units_count = 0
-        self.add_unit(window, self.last_unit_index)
         self.read = read
+        self.plot_3d_settings = plot_3d_settings
+        #for 3D plots
+        if plot_3d_settings!= None:
+            self.x_units = plot_3d_settings["x_units"]
+            self.z_units = plot_3d_settings["z_units"]
+            self.before_x_seq = plot_3d_settings["before_x_seq"]
+            self.after_x_seq = plot_3d_settings["after_x_seq"]
+            self.before_z_seq = plot_3d_settings["before_z_seq"]
+            self.after_z_seq = plot_3d_settings["after_z_seq"]
+            self.x_counts_for_3d = 0
+            self.z_counts_for_3d = 0
+            self.in_x_region_flag = False
+            self.in_z_region_flag = False
+            if self.before_x_seq == None:
+                self.in_x_region_flag == True
+     
+            if self.before_z_seq == None:
+                self.in_z_region_flag == True
+        #add the unit
+        self.add_unit(window, self.last_unit_index)
 
 
     def add_unit(self, window, index): #index is the last base index in the sequence
@@ -39,12 +60,55 @@ class Repeat():
 
         if window in self.unique_repeat_units_list:
             self.unique_repeat_units_count +=1
-    '''
-    def get_SNP_index(self, window, index):
-        for i in range(0,len(window)):
-            if (window[i] != self.repeat_unit[i]) :
-                return index -len(window)+i
-	'''
+        
+        if self.plot_3d_settings!= None:
+            self.add_x_count(index, window)
+            self.add_z_count(index, window)
+
+
+      
+
+    def add_z_count(self, index, window):
+        if self.check_seq_before_repeat(index-len(window), self.before_z_seq):
+            self.in_z_region_flag = True
+        
+        #print(window in self.z_units, window, self.z_units)
+        if self.in_z_region_flag and (window in self.z_units):
+            self.z_counts_for_3d += 1
+
+        if self.check_seq_after_repeat(index, self.after_z_seq):
+            self.in_z_region_flag = False  
+
+    def add_x_count(self, index, window):
+        if self.check_seq_before_repeat(index-len(window), self.before_x_seq):
+            self.in_x_region_flag = True
+
+        if self.in_x_region_flag and (window in self.x_units):
+            self.x_counts_for_3d += 1
+
+        if self.check_seq_after_repeat(index, self.after_x_seq):
+                self.in_x_region_flag = False
+
+
+    def check_seq_before_repeat(self, window_start_index, before_seq):
+        if before_seq != None:
+            if self.read[window_start_index-len(before_seq):window_start_index] == before_seq:
+                return True
+            else:
+                return False 
+        else:
+            return False
+       
+    
+    def check_seq_after_repeat(self, index, after_seq):
+        if after_seq != None:
+            if self.read[index:index+len(after_seq)] == after_seq:
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def change_last_unit_index(self, index):
         self.last_unit_index = index
 
