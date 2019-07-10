@@ -65,8 +65,6 @@ class AllelesDetector():
             self.color_code = "red"
             self.first_allele = matching_sequences[0]
             self.second_allele = matching_sequences[1] 
-            for matching_sequence in (matching_sequences):
-                print(matching_sequence.sequence_string)
             return([matching_sequences[0].sequence_string, matching_sequences[1].sequence_string,
                     "More than two potential alleles, please check manually", str(self.peak_repeat_counts)])
         
