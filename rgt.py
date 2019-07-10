@@ -31,7 +31,6 @@ class RGT():
                             end_flank=self.settings["end_flank"],
                             discard_reads_with_no_end_flank=self.settings["discard_reads_with_no_end_flank"])
             reads = file.reads #extracted reads from between flanks
-
             #genotype the reads (create counts table and repeat sequence abundance table)
             genotype = Genotype(reads,self.settings)
 
@@ -74,7 +73,7 @@ class RGT():
             self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)
 
         except Exception as e:
-            raise(e)
+            #print(e)
             print("can not genotype " + sample_code)
             output_table[sample_code] = ["can not get allele","can not get allele","Error","[]","!"]
             color_table[sample_code] = {1:"red", 4:"red", 6:"red"}

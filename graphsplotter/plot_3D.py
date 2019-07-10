@@ -24,31 +24,48 @@ def plot_3D(table, export_directory, sample_code, first_allele, second_allele,
 
 
     for i in range(len(xvals)): #plot all values
-        ax.bar3d(xvals[i]-0.5, yvals[i]-0.5, 0, 0.5, 0.5, zvals[i],color='#2E86C1', shade=True,alpha=1)
-    
-    first_allele_index = xvals.index(first_allele.x_count) 
-    second_allele_index = xvals.index(second_allele.x_count)  
+        if xvals[i] == first_allele.x_count and yvals[i] == first_allele.z_count:
+            ax.bar3d(first_allele.x_count, first_allele.z_count-0.5,
+                0, 0.5, 0.5, table[(first_allele.x_count,first_allele.z_count)],
+                color='#c0392b', shade=True,alpha=1)
+        elif xvals[i] == second_allele.x_count and yvals[i] == second_allele.z_count:
+            ax.bar3d(second_allele.x_count, second_allele.z_count-0.5,
+                0, 0.5, 0.5, table[(second_allele.x_count,second_allele.z_count)],
+                color='#EC7063', shade=True,alpha=1)
+        else:
+            ax.bar3d(xvals[i], yvals[i]-0.5, 0, 0.5, 0.5, zvals[i],color='#2E86C1', shade=True,alpha=1)
 
-    ax.bar3d(xvals[second_allele_index]-0.5, yvals[second_allele_index]-0.5,
-            0, 0.5, 0.5, zvals[second_allele_index],color='#EC7063', shade=True,alpha=1)
-
-    ax.bar3d(xvals[first_allele_index]-0.5, yvals[first_allele_index]-0.5,
-            0, 0.5, 0.5, zvals[first_allele_index],color='#c0392b', shade=True,alpha=1)
     
     first_proxy = plt.Rectangle((0, 0), 1, 1, fc="#c0392b")
     second_proxy = plt.Rectangle((0, 0), 1, 1, fc="#EC7063")
-    frst_legnd = first_allele.sequence_string + "  ("+xlabel+ ": "+ str(xvals[first_allele_index]) +\
-                ") , ("+zlabel+": "+str(zvals[first_allele_index])+")" 
+    frst_legnd = first_allele.sequence_string + "  ("+xlabel+ ": "+ str(first_allele.x_count) +\
+                ") , ("+zlabel+": "+str(first_allele.z_count)+")" 
 
-    scnd_legnd = second_allele.sequence_string + "  ("+xlabel+ ": "+ str(xvals[second_allele_index]) +\
-                ") , ("+zlabel+": "+str(zvals[second_allele_index])+")" 
-    if first_allele == second_allele:
-        frst_legnd += str(first_allele.abundance/first_allele.abundance+second_allele.abundance)
-        scnd_legnd += str(second_allele.abundance/first_allele.abundance+second_allele.abundance)
+    scnd_legnd = second_allele.sequence_string + "  ("+xlabel+ ": "+ str(second_allele.x_count) +\
+                ") , ("+zlabel+": "+str(second_allele.z_count)+")" 
     
-    ax.legend((first_proxy,second_proxy),
+    if (first_allele != second_allele and first_allele.x_count == second_allele.x_count
+        and first_allele.z_count == second_allele.z_count): #two allels same counts
+        frst_legnd += " "+str((first_allele.abundance/(first_allele.abundance+second_allele.abundance))*100)+"%"
+        scnd_legnd += " "+str((second_allele.abundance/(first_allele.abundance+second_allele.abundance))*100)+"%"
+        second_proxy = first_proxy
+
+    if first_allele == second_allele: #homozygous
+        ax.legend((first_proxy,),
+           (frst_legnd,),
+           fontsize=6, borderaxespad=0, frameon=False, loc='upper left')
+    else:    
+        ax.legend((first_proxy,second_proxy),
            (frst_legnd,scnd_legnd),
            fontsize=6, borderaxespad=0, frameon=False, loc='upper left')
+    ticks_scaling_factor = (max_value//15)+1
+    plt.xticks(list(range(1,max_value,ticks_scaling_factor)),
+               list(range(1,max_value,ticks_scaling_factor)),
+               fontsize=6 , fontweight='medium' ) #4.5
+
+    plt.yticks(list(range(1,max_value,ticks_scaling_factor)),
+               list(range(1,max_value,ticks_scaling_factor)),
+               fontsize=6 , fontweight='medium' ) #4.5
 
     ax.set_title(sample_code,loc='center',pad=35, color=color_codes[color_code])
 

@@ -34,10 +34,10 @@ class Repeat():
             self.in_x_region_flag = False
             self.in_z_region_flag = False
             if self.before_x_seq == None:
-                self.in_x_region_flag == True
-     
+                self.in_x_region_flag = True
+
             if self.before_z_seq == None:
-                self.in_z_region_flag == True
+                self.in_z_region_flag = True
         #add the unit
         self.add_unit(window, self.last_unit_index)
 
@@ -87,7 +87,8 @@ class Repeat():
             self.x_counts_for_3d += 1
 
         if self.check_seq_after_repeat(index, self.after_x_seq):
-                self.in_x_region_flag = False
+            self.read
+            self.in_x_region_flag = False
 
 
     def check_seq_before_repeat(self, window_start_index, before_seq):

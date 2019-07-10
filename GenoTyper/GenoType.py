@@ -32,6 +32,8 @@ class Genotype():
 
         else:
             self.repeat_units = self.settings["repeat_units"]
+            self.unique_repeat_units = self.settings["unique_repeat_units"]
+            
         self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
         self.reads = reads
         self.min_size_repeate = self.settings["min_size_repeate"]

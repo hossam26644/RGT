@@ -33,5 +33,8 @@ def plot_graphs(settings, genotype,output_directory, sample_code, first_allele, 
         xlabel =' , '.join(settings["3D_plot_parameters"]["x_units"]) + " count"
         zlabel =' , '.join(settings["3D_plot_parameters"]["z_units"]) + " count"
 
+        if xlabel == zlabel:
+            xlabel += "(1)"
+            zlabel += "(2)"
         plot_3D(table_3d, plot_directory, sample_code, first_allele, second_allele,
                 xlabel, zlabel, color_code=color_code)
