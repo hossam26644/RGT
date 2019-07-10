@@ -26,15 +26,18 @@ def plot_graphs(settings, genotype,output_directory, sample_code, first_allele, 
         first_allele_count, second_allele_count,xlabel, color_code=color_code)
 
     #plot the 3D plot
-    if settings["3D_plot_parameters"] != None:
-        table_3d = genotype.table_3d
-        plot_directory = output_directory+ "/Plots/3d_plots/"+sample_code+".png"
+    try:
+        if settings["3D_plot_parameters"] != None:
+            table_3d = genotype.table_3d
+            plot_directory = output_directory+ "/Plots/3d_plots/"+sample_code+".png"
 
-        xlabel =' , '.join(settings["3D_plot_parameters"]["x_units"]) + " count"
-        zlabel =' , '.join(settings["3D_plot_parameters"]["z_units"]) + " count"
+            xlabel =' , '.join(settings["3D_plot_parameters"]["x_units"]) + " count"
+            zlabel =' , '.join(settings["3D_plot_parameters"]["z_units"]) + " count"
 
-        if xlabel == zlabel:
-            xlabel += "(1)"
-            zlabel += "(2)"
-        plot_3D(table_3d, plot_directory, sample_code, first_allele, second_allele,
-                xlabel, zlabel, color_code=color_code)
+            if xlabel == zlabel:
+                xlabel += "(1)"
+                zlabel += "(2)"
+            plot_3D(table_3d, plot_directory, sample_code, first_allele, second_allele,
+                    xlabel, zlabel, color_code=color_code)
+    except Exception as e:
+        print("can't 3d plot "+sample_code)
