@@ -163,7 +163,7 @@ class AllelesDetector():
 
     def get_seq_from_matching_peaks_more_than_counts_of(self, matching_sequence):
         detected_peak = matching_sequence.repeat_units_count
-        repeat_counts_bigger_than_detected_allele = [x for x in self.peak_repeat_counts if x >= detected_peak]
+        repeat_counts_bigger_than_detected_allele = [x for x in self.peak_repeat_counts if x > detected_peak]
         
         for idx, possibe_allele in enumerate(self.sorted_geno_list):
             if (possibe_allele[1][1]) in repeat_counts_bigger_than_detected_allele:
