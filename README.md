@@ -37,7 +37,7 @@ RGT
 │             │───  plot_3D.py
 │             └───  __init__.py
 │ 
-└──────────── AllelesDetector
+└──────────── allelesdetector
               │───  AllelesDetector.py
               │───  MatchingSequence.py
               │───  PeakIdentifier.py

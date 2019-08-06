@@ -2,7 +2,7 @@ from FileReader.ReadFile import ReadFile
 from GenoTyper.GenoType import Genotype, get_rev_complementry
 
 from ExcelExporter.ExcelExport import ExcelWriter
-from AllelesDetector.AllelesDetector import AllelesDetector
+from allelesdetector.AllelesDetector import AllelesDetector
 from graphsplotter.plotter import plot_graphs
 
 import glob
