@@ -23,7 +23,7 @@ RGT
 │             │───  ExcelExport.py 
 │             └───  __init__.py
 │ 
-└──────────── GenoTyper
+└──────────── genotyper
 │             │───  GenoType.py
 │             │───  Repeat.py
 │             │───  SmartString.py
