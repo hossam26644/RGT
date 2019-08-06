@@ -15,11 +15,11 @@ RGT
 │             │───  json_parser.py
 │             └───  __init__.py
 │ 
-└──────────── FileReader
+└──────────── filereader
 │             │─── ReadFile.py 
 │             └───  __init__.py
 │
-└──────────── ExcelExporter
+└──────────── excelexporter
 │             │───  ExcelExport.py 
 │             └───  __init__.py
 │ 

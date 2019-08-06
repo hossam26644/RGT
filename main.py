@@ -5,7 +5,7 @@ import sys
 from joblib import Parallel, delayed, cpu_count
 from interface.interface import get_user_inputs
 from interface.json_parser import extract_parameters
-from ExcelExporter.ExcelExport import ExcelWriter
+from excelexporter.ExcelExport import ExcelWriter
 
 
 def get_collective_dictionary_from_list_of_output_dictionaries(list_of_output_dictionaries):
