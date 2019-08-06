@@ -18,7 +18,7 @@ RGT is a software to:
 * Peaks from this graph is used to identified the germline alleles
 
 > Every structure identified is stored regardless of the sequencing errors and variations and exported in a separate excel file for the user
-
+[![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/CountsPlot.png "Hello World")*Example of a a counts plot*]
 ##### The most abundant repeat strucutres are matched with the peaks identified in the "repeating units count vs structures having this count plot" to get the two human germline alleles
 
 ## lets get to the developers guide:
@@ -98,13 +98,74 @@ It is the package that is responisble for extracting the repeat structure from r
   * The detection of the first unit creates a repeat object, this object stores the start index of the repeat sequence.
   * Each detected repeat unit is inserted in the repeat object, where the count of repeat units is incremented, and the end index of the repeat sequence is shifted to the index of the last inserted repeat unit.
   * Units having one mismatch with one of the repeat units are considered, to compensate expected sequencing errors, they are inserted in a buffer (temporary storage) that is flushed to the repeat object if another repeat unit exists after them
+  [![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Repeatunits.png "Hello World")*adding repeat units*]
   * The software keeps searching for repeat units in the region downstream of the last identified repeat unit in the region downstream of the last identified repeat unit. This region starts with the base succeeding the last identified repeat unit, and the size of the region equals the user identified maximum allowed interruption length 
-
+  [![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Interruption.png "Hello World")*dealing with interruptions*]
 Now the repeat sequence is identified, and the number of repeat units is counted in every one of them
 
   * Identified repeat sequences are inserted in a hashtable (a python dictionary), key is the strucutre and the value is the number of reads having the same structures
 * Simultaneously another table is created (count table), where the key is the number of units in a structure, and the value is the number of reads having this number of units
   
   
+### Now we have the structures, how the germline alleles are detected:
+  * Peaks in the counts table that are above a threshold are identified, this threshold is set to the average value of read count per sequence in the counts table
+    [![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Peaks.png "Hello World")*peaks in the counts table*]
+
+  * The most abundant structures are extracted from the genotable, they are identified as structures having 30% or more reads of the most abundant structure read count
+  
+  * This list is matched with the peaks identified from the counts table by the repeat structures units count, then a decision tree is executed depending on the number of matches identified.
+
+  * The decision tree: 
+  
+  ```
 
 
+└──────────── Zero mtaches
+│             │
+│             └───  Error can't genotype
+│ 
+│
+└──────────── >2 matches
+│             │
+│             └───  Error can't genotype
+│
+│
+└──────────── 2 matches
+│             │
+│             └───  is the most abundant strucutre not matched with a peak?
+│             |       │
+│             |       └─── flag the sample
+│             | 
+│             └───  do both sequences have the same repeat units count
+|             |       |   (peak may be a result of overlapping two less abundant 
+│             |       │    structures in the sample)
+│             |       │
+│             |       └─── flag the sample
+│             |
+|             └───  Export both alleles
+│             
+│
+│
+└──────────── one match
+              │
+              └───  Check expanded allele 
+              |       | (there is a peak and there is no strucutre matching             
+              |       │  in the most abundant structures list) 
+              |       │              
+              |       └─── flag the sample, export the most abundant strucutre 
+              |            outside the list, matching the peak as the second allele
+              |    
+              └───  Check tandem alleles
+              |       | (the n+1 structure is more abundant than the n-1  
+              |       |  where n is the identified allele)     
+              |       |              
+              |       | (n+1 represents the first somatic variability, n-1 the first
+              |       |  PCR slippage result, theoritically the first is less abundant
+              |       |  unless it is an allele)     
+              |       |              
+              |       └─── Export the n+1 strucutre as the second allele          
+              |    
+              └───  Export the identified allele as the homozygous allele of the sample              
+              
+
+```
