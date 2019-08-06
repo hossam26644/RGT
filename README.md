@@ -85,5 +85,26 @@ It is the package that is responisble for extracting the repeat structure from r
 
   #### first lets discuss other modules in the genotyper pacakage:
   * **revComplementary**: computes the reverse complement of a sequence, it's only useful if the user is working on the reverse strand
-  * **GroupingString**: groups a sequence by the user input grouping units
-    e.g *CAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAACAGCCGCCACCGCCGCCGCCGCCGCCGCCGCCGCCGCCGCCTCCTCAG* is grouped to *[CAG]15[CAACAG]1[CCGCCA]1[CCG]10[CCT]2[CAG]1* when the user input grouping units are: CAG CAACAG CCGCCA CCG CCT
+  * **GroupingString**: groups a sequence by the user input grouping units 
+  e.g *CAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAACAGCCGCCACCGCCGCCGCCGCCGCCGCCGCCGCCGCCGCCTCCT* is grouped to *[CAG]15[CAACAG]1[CCGCCA]1[CCG]10[CCT]2* when the user input grouping units are: CAG CAACAG CCGCCA CCG CCT
+    * grouping is done by a sliding windows that identifies the user input units then slides to count them, eventualy it substitutes the repeating units with one unit between square brackets and the number of copies of this unit 
+  * **SmartString** does the grouping when the user identifies no grouping units, 
+    >it uses a slow runner fast runner algorithm, where a slow runner sliding window identifies repeat units, and the fast runner window counts the repeating units. This code is executed recursively on ungrouped parts of the sequence with increasing window size to detect larger repeating units. The stopping condition is to have a window size larger than half the sequence length -because there will be no possibility to have a longer repeating unit-.
+    
+  * **Repeat**: the repeat class, has the attributes of a repeat object, like its start index, the number of repeat units in it,..etc
+
+
+### Now how the repeat strucutre is identified (in the GenoTyper module):
+  * The detection of the first unit creates a repeat object, this object stores the start index of the repeat sequence.
+  * Each detected repeat unit is inserted in the repeat object, where the count of repeat units is incremented, and the end index of the repeat sequence is shifted to the index of the last inserted repeat unit.
+  * Units having one mismatch with one of the repeat units are considered, to compensate expected sequencing errors, they are inserted in a buffer (temporary storage) that is flushed to the repeat object if another repeat unit exists after them
+  * The software keeps searching for repeat units in the region downstream of the last identified repeat unit in the region downstream of the last identified repeat unit. This region starts with the base succeeding the last identified repeat unit, and the size of the region equals the user identified maximum allowed interruption length 
+
+Now the repeat sequence is identified, and the number of repeat units is counted in every one of them
+
+  * Identified repeat sequences are inserted in a hashtable (a python dictionary), key is the strucutre and the value is the number of reads having the same structures
+* Simultaneously another table is created (count table), where the key is the number of units in a structure, and the value is the number of reads having this number of units
+  
+  
+
+
