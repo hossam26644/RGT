@@ -1,8 +1,18 @@
-from rgt import RGT
-import glob
-import sys
+''' main module, run this file to start RGT
 
+This module gets user inputs, assigns different processes to different files,
+run them in parallel, gets the collective result from all samples, then
+exports the summative result in an excel file.
+
+this is done by creating multible instances of the RGT class that does the
+analysis for each file
+
+'''
+import sys
+import glob
 from joblib import Parallel, delayed, cpu_count
+
+from rgt import RGT
 from interface.interface import get_user_inputs
 from interface.json_parser import extract_parameters
 from excelexporter.ExcelExport import ExcelWriter
@@ -16,7 +26,11 @@ def get_collective_dictionary_from_list_of_output_dictionaries(list_of_output_di
         output_dictionary[key] = dictionary[key]
     return(output_dictionary)
 
+
 def main():
+    ''' gets user inputs, creats multible instances of the RGT class to analyse each sample
+    and exports the summative result in an excel file
+    '''
     input_directory, output_directory, settings_file, number_of_threads = get_user_inputs(sys.argv[1:])
     settings = extract_parameters(settings_file)
     samples = glob.glob(input_directory + "/*.fastq")

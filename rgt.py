@@ -1,12 +1,15 @@
+''' RGT class, does analysis on a single sample (fastq file)
+'''
+import glob
+from joblib import Parallel, delayed, cpu_count
+
 from filereader.ReadFile import ReadFile
 from genotyper.GenoType import Genotype, get_rev_complementry
-
 from excelexporter.ExcelExport import ExcelWriter
 from allelesdetector.AllelesDetector import AllelesDetector
 from graphsplotter.plotter import plot_graphs
 
-import glob
-from joblib import Parallel, delayed, cpu_count
+
 
 
 class RGT():
