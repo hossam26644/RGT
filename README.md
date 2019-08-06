@@ -65,6 +65,10 @@ RGT
               └───  __init__.py
 
 ```
+## how parallel processing is done:
+* The main class uses joblib parallel, it does the job for you
+* Processes are created by it and instances of the RGT class where the analysis is done are excuted in parallel
+* The results of all processes are put in a list of dictionaries, there is a method *get_collective_dictionary_from_list_of_output_dictionaries* (do you like my naming style?) to (as you would imagine) get a collective dictionary from the list of output dictionaries
 
 ## Do I have to explain every single detail? sorry I am not going to
 * the interface gets user inputs, nothing smart in that 
@@ -72,3 +76,6 @@ RGT
 * file reader parses fastq files and extracts the reads:
   * it searches for the flanking sequences and extract reads from between these flanks
   * flanking sequence match is identified when a sequence has a [hamming distance](https://en.wikipedia.org/wiki/Hamming_distance) of one or zero with the flank
+  * when there is no upstream flank found (if uyser specified a start flank) the whole read is discarded
+  * if the user specidfies to discard reads when there is no down stream flank.. and no down stream flank is found: guess what, the read is discarded
+  * The percentage of the discarded reads is calculated and the sample is flagged if this percentage is greater than a threshold identified by the user (or default value set by the software)
