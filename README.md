@@ -18,7 +18,7 @@ RGT is a software to:
 * Peaks from this graph is used to identified the germline alleles
 
 > Every structure identified is stored regardless of the sequencing errors and variations and exported in a separate excel file for the user
-[![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/CountsPlot.png "Hello World")*Example of a a counts plot*]
+![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/CountsPlot.png "Example of a a counts plot")*Example of a a counts plot*
 ##### The most abundant repeat strucutres are matched with the peaks identified in the "repeating units count vs structures having this count plot" to get the two human germline alleles
 
 ## lets get to the developers guide:
@@ -98,9 +98,12 @@ It is the package that is responisble for extracting the repeat structure from r
   * The detection of the first unit creates a repeat object, this object stores the start index of the repeat sequence.
   * Each detected repeat unit is inserted in the repeat object, where the count of repeat units is incremented, and the end index of the repeat sequence is shifted to the index of the last inserted repeat unit.
   * Units having one mismatch with one of the repeat units are considered, to compensate expected sequencing errors, they are inserted in a buffer (temporary storage) that is flushed to the repeat object if another repeat unit exists after them
-  [![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Repeatunits.png "Hello World")*adding repeat units*]
+ 
+ ![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Repeatunits.png "adding repeat units")*Identifying the start index and the end index of a repeat sequence, including a unit with mismatch within the sequence structure (GTG in a CTG repeat) , green arrow represents the identified repeat sequence start index, blue arrow represents the end index of the identified repeat sequence, red curly bracket represents the sliding window identifying repeat units*
+  
   * The software keeps searching for repeat units in the region downstream of the last identified repeat unit in the region downstream of the last identified repeat unit. This region starts with the base succeeding the last identified repeat unit, and the size of the region equals the user identified maximum allowed interruption length 
-  [![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Interruption.png "Hello World")*dealing with interruptions*]
+  ![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Interruption.png "dealing with interruptions")*Identifying repeat sequence with an interruption(TTTT in a CTG repeat), sliding window keeps searching for possible repeats after the final identified one, allowing a maximum interruption of length identified by the user (four or greater in this case), green arrow represents the identified repeat sequence start index, blue arrow represents the end index of the identified repeat sequence, red curly bracket represents the sliding window identifying repeat units*
+
 Now the repeat sequence is identified, and the number of repeat units is counted in every one of them
 
   * Identified repeat sequences are inserted in a hashtable (a python dictionary), key is the strucutre and the value is the number of reads having the same structures
@@ -109,7 +112,7 @@ Now the repeat sequence is identified, and the number of repeat units is counted
   
 ### Now we have the structures, how the germline alleles are detected:
   * Peaks in the counts table that are above a threshold are identified, this threshold is set to the average value of read count per sequence in the counts table
-    [![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Peaks.png "Hello World")*peaks in the counts table*]
+    ![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/Peaks.png "peaks in the counts table")*Counts table plotted for a DM1 sample, green line represents average value, peaks identified above the threshold value in green circles, red circle represents peaks below threshold value, peak in the red circle is discarded in this case*
 
   * The most abundant structures are extracted from the genotable, they are identified as structures having 30% or more reads of the most abundant structure read count
   
@@ -169,3 +172,14 @@ Now the repeat sequence is identified, and the number of repeat units is counted
               
 
 ```
+## Plotting (graphsplotter package):
+* The plotter module prepares data to be plotted, methods and vairables names should be clear enough that I dont have to explain them
+* table_2d_plotter module does what you think it does, it plots a table in a 2d graph, currently it is used twice, for the total counts plot and for the specified units count
+* plot_3D module plots the 3d plot of 2 counts vs each other vs the abundance of samples having these counts
+  * these counts are in the table_3d in the genotype object
+
+![Semantic description of image](https://github.com/hossam26644/RGT/blob/enh/pep8/ImagesForReadme/3D_Plot.png "3d plot example") *3D plot of CAG counts vs CCG counts in an HD sample*
+
+## Now if you have read the manual, and the code, but still have questions: you are a very unlucky person because you have to contact me
+* email: hossam26644@live.com
+* linkedin: [https://uk.linkedin.com/in/hossameldin-ali](https://uk.linkedin.com/in/hossameldin-ali)
