@@ -3,7 +3,7 @@ import sys
 import distutils
 
 def extract_parameters(json_file):
-    with open(json_file) as json_file:  
+    with open(json_file) as json_file:
         settings = json.load(json_file)
         check_parameters(settings)
         return(settings)
@@ -54,13 +54,13 @@ def check_parameters(settings):
         settings["unique_repeat_units"].sort(key=len,reverse=True)
     except Exception as e:
         settings["unique_repeat_units"] = settings["repeat_units"]
-   
+
     try:
         settings["grouping_repeat_units"]
         settings["grouping_repeat_units"].sort(key=len,reverse=True)
     except Exception as e:
         settings["grouping_repeat_units"] = None
-    
+
     try:
         settings["min_size_repeate"]
     except Exception as e:
@@ -72,9 +72,14 @@ def check_parameters(settings):
         settings["max_interrupt_tract"] = 5
 
     try:
+        settings["number_of_allowed_flank_point_mutations"]
+    except Exception as e:
+        settings["number_of_allowed_flank_point_mutations"] = 1
+
+    try:
         settings["discard_reads_with_no_end_flank"]
         settings["discard_reads_with_no_end_flank"] = get_bool_value_from_string(settings["discard_reads_with_no_end_flank"])
-        
+
     except Exception as e:
         settings["discard_reads_with_no_end_flank"] = False
     try:
@@ -87,14 +92,14 @@ def check_parameters(settings):
     except Exception as e:
         settings["reverse_strand"] = False
     try:
-    	settings["minimum_no_of_reads"]
+        settings["minimum_no_of_reads"]
     except Exception as e:
-    	settings["minimum_no_of_reads"] = 30
+        settings["minimum_no_of_reads"] = 30
 
     try:
         settings["3D_plot_parameters"]
         check_3d_plot_params(settings["3D_plot_parameters"])
     except Exception as e:
         settings["3D_plot_parameters"] = None
-    
+
     print(settings)

@@ -16,10 +16,12 @@ from rgt import RGT
 from interface.interface import get_user_inputs
 from interface.json_parser import extract_parameters
 from excelexporter.ExcelExport import ExcelWriter
+import multiprocessing
 
+multiprocessing.freeze_support()
 
 def get_collective_dictionary_from_list_of_output_dictionaries(list_of_output_dictionaries):
-    ''' Convert the output of the parallel processing to a single dictionary''' 
+    ''' Convert the output of the parallel processing to a single dictionary'''
     output_dictionary = {}
     for dictionary in list_of_output_dictionaries:
         key = list(dictionary.keys())[0] #get the first key(the only one)
@@ -38,11 +40,11 @@ def main():
 
     if number_of_threads == None:
         number_of_threads = cpu_count()
-    result = Parallel(n_jobs=number_of_threads, verbose=1)(map(delayed(rgt_.rgt),(samples)))
-    
+    result = Parallel(n_jobs=number_of_threads, verbose=1, backend="multiprocessing")(map(delayed(rgt_.rgt),(samples)))
+
     automated_genotyope = [i[0] for i in result]
     color_table = [i[1] for i in result]
-    
+
     output_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(automated_genotyope)
     color_code_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(color_table)
     collective_excel_writer = ExcelWriter()

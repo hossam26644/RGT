@@ -13,7 +13,7 @@ from graphsplotter.plotter import plot_graphs
 
 
 class RGT():
-    
+
     def __init__(self, settings, input_directory, output_directory):
         self.settings = settings
         self.input_directory = input_directory
@@ -32,13 +32,14 @@ class RGT():
             #read file and extract sequence from between flanks
             file = ReadFile(sample ,start_flank=self.settings["start_flank"],
                             end_flank=self.settings["end_flank"],
+                            number_of_allowed_flank_point_mutations=int(self.settings["number_of_allowed_flank_point_mutations"]),
                             discard_reads_with_no_end_flank=self.settings["discard_reads_with_no_end_flank"])
             reads = file.reads #extracted reads from between flanks
             #genotype the reads (create counts table and repeat sequence abundance table)
             genotype = Genotype(reads,self.settings)
 
             geno_table = genotype.get_geno_table() #the repeat sequence abundance table
-            counts_table = genotype.get_counts_table() 
+            counts_table = genotype.get_counts_table()
             unique_counts_table = genotype.get_unique_counts_table()
 
             #sort the three tables by abundance
@@ -46,7 +47,7 @@ class RGT():
             sorted_counts_table = dict(sorted(counts_table.items(), key=lambda x: x[1], reverse=True))
             sorted_unique_counts_table = dict(sorted(unique_counts_table.items(), key=lambda x: x[1], reverse=True))
 
-            #write three tabels to excel 
+            #write three tabels to excel
             excel_writer = ExcelWriter()
             if self.settings["3D_plot_parameters"] != None:
                 xlabel =' , '.join(self.settings["3D_plot_parameters"]["x_units"]) + " count"
