@@ -19,9 +19,7 @@ from rgt import RGT
 from interface.interface import get_user_inputs
 from interface.json_parser import extract_parameters
 from excelexporter.ExcelExport import ExcelWriter
-import multiprocessing
 
-multiprocessing.freeze_support()
 
 def get_collective_dictionary_from_list_of_output_dictionaries(list_of_output_dictionaries):
     ''' Convert the output of the parallel processing to a single dictionary'''
@@ -43,6 +41,7 @@ def main():
 
     if number_of_threads == None:
         number_of_threads = cpu_count()
+    number_of_threads = min(number_of_threads, len(samples))
     result = Parallel(n_jobs=number_of_threads, verbose=1, backend="multiprocessing")(map(delayed(rgt_.rgt),(samples)))
 
     automated_genotyope = [i[0] for i in result]
