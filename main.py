@@ -10,6 +10,9 @@ analysis for each file
 '''
 import sys
 import glob
+import multiprocessing
+multiprocessing.freeze_support()
+
 from joblib import Parallel, delayed, cpu_count
 
 from rgt import RGT
