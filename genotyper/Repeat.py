@@ -114,10 +114,10 @@ class Repeat():
         self.last_unit_index = index
 
     def get_non_perfect_units_percentage(self):
-    	return self.non_perfect_units/self.number_of_units
+        return self.non_perfect_units/self.number_of_units
 
     def get_seq(self):
-    	return self.read[self.start_index:self.last_unit_index]
+        return self.read[self.start_index:self.last_unit_index]
     
     def get_seq_smart_string(self, rev_strand):
         if rev_strand:
