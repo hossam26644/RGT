@@ -16,7 +16,8 @@ def plot_2d_table(table, export_directory, sample_code, first_allele, second_all
     x_ticks_scaling_factor = (max(x)//40)+1 # scale the number of x-ticks to avoid their overlap 
 
 
-    graph = plt.bar(x,y, align='center', alpha=0.65)
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
+    bars = ax.bar(x, y, align="center", alpha=0.65)
     
     try:
         #get the index of the alleles in the x data
@@ -24,26 +25,23 @@ def plot_2d_table(table, export_directory, sample_code, first_allele, second_all
         second_allele_index = x.index(second_allele_count)
         
         #color the bars that correspond to the alleles
-        graph[second_allele_index].set_facecolor('#EC7063')
-        graph[first_allele_index].set_facecolor('r')
+        bars[second_allele_index].set_facecolor('#EC7063')
+        bars[first_allele_index].set_facecolor('r')
         
     except:
         pass
 
     # manipulating the xticks, font, rotation,and step
-    plt.xticks(list(range(1,max(x),x_ticks_scaling_factor)),
-               list(range(1,max(x),x_ticks_scaling_factor)),
-               fontsize=6 , rotation=30, fontweight='medium' ) #4.5
-    
-
-    plt.yticks(fontsize=6, fontweight='medium')
-
-    plt.title(sample_code, color=color_codes[color_code])
-    plt.xlabel(xlabel)
-    plt.ylabel("Number of reads" )
+    ticks = list(range(1, max(x), x_ticks_scaling_factor))
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(ticks, fontsize=6, rotation=30, fontweight="medium")    
+    ax.tick_params(axis="y", labelsize=6)
+    ax.set_title(sample_code, color=color_codes.get(color_code, "k"))
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel("Number of reads")
     
     try: #all the hassle in this try is to put the legend
-        ax = plt.gca()
+        #ax = plt.gca()
         if first_allele != second_allele : #heterozygous
             if first_allele_index == second_allele_index:
                 
@@ -54,18 +52,19 @@ def plot_2d_table(table, export_directory, sample_code, first_allele, second_all
                 first_legend_string = first_allele.sequence_string +" ("+ str(round(first_allele_percentage, 1)*100) + "%)" 
                 second_legend_string = second_allele.sequence_string +" ("+ str(round(second_allele_percentage, 1)*100) + "%)"
                 
-                ax.legend((graph[first_allele_index], graph[second_allele_index] ),
+                ax.legend((bars[first_allele_index], bars[second_allele_index] ),
                     ([first_legend_string, second_legend_string]),
                      fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
             else:
-                ax.legend((graph[first_allele_index], graph[second_allele_index] ),
+                ax.legend((bars[first_allele_index], bars[second_allele_index] ),
                     ([first_allele.sequence_string, second_allele.sequence_string]),
                      fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
         else: #homozygous
-            ax.legend((graph[first_allele_index],),
+            ax.legend((bars[first_allele_index],),
                (first_allele.sequence_string,),fontsize=4, borderaxespad=0, frameon=False, loc='upper left')
     except:
         pass
 
-    plt.savefig(export_directory, dpi=600)
-    plt.clf()
+    fig.tight_layout()
+    fig.savefig(export_directory, dpi=600)
+    plt.close(fig)
