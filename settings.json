@@ -1,0 +1,9 @@
+{
+"start_flank": "CCACAGCCTA",
+"end_flank": "GATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
+"repeat_units": ["CAG","CAA", "CGG", "CCG","CAT", "CAA", "AAG"],
+"unique_repeat_units":["CAG"],
+"min_size_repeate": 5,
+"max_interrupt_tract": 5
+
+}
