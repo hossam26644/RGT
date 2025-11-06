@@ -12,6 +12,7 @@ from graphsplotter.plotter import plot_graphs
 
 
 
+
 class RGT():
     
     def __init__(self, settings, input_directory, output_directory):
