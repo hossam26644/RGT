@@ -1,5 +1,6 @@
 '''docstring'''
 from scipy import signal
+import numpy as np
 
 class PeakIdentifier():
     """docstring for main"""
@@ -15,10 +16,19 @@ class PeakIdentifier():
         average = sum(self.counts_array)/len(self.counts_array)
         #print(average)
         #print(signal.find_peaks(self.counts_array, threshold=average, distance=1))
-        ans = signal.find_peaks(self.counts_array, prominence=average)
+        #ans = signal.find_peaks(self.counts_array, prominence=average)
+
+        padded = np.pad(self.counts_array, (1, 1), mode='constant', constant_values=0)
+        peaks, _ = signal.find_peaks(padded, prominence=average)
+
+        # Adjust indices back
+        peaks = peaks - 1
+        peaks = peaks[(peaks >= 0) & (peaks < len(self.counts_array))]
+
+
         #print(self.counts_array)
         #print(ans[0])
-        return(ans[0])
+        return(peaks)
 
     def get_counts_array(self,counts_table):
         ''' get array from counts_table dictionary, the array index is the dictionary
