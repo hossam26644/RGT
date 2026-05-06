@@ -37,7 +37,7 @@ def main():
     rgt_ = RGT(settings, input_directory, output_directory)
 
     if number_of_threads == None:
-        number_of_threads = cpu_count()
+        number_of_threads = min(cpu_count(), len(samples))
     result = Parallel(n_jobs=number_of_threads, verbose=1)(map(delayed(rgt_.rgt),(samples)))
     
     automated_genotyope = [i[0] for i in result]
