@@ -87,9 +87,18 @@ def check_parameters(settings):
     except Exception as e:
         settings["reverse_strand"] = False
     try:
+        settings["PCR_free"]
+        settings["PCR_free"] = get_bool_value_from_string(settings["PCR_free"])
+    except Exception as e:
+        settings["PCR_free"] = False
+
+    try:
     	settings["minimum_no_of_reads"]
     except Exception as e:
-    	settings["minimum_no_of_reads"] = 30
+        if settings["PCR_free"] == True:
+            settings["minimum_no_of_reads"] = 1
+        else:
+            settings["minimum_no_of_reads"] = 30
 
     try:
         settings["3D_plot_parameters"]

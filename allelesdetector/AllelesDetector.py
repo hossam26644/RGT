@@ -4,7 +4,7 @@ from .MatchingSequence import MatchingSequence
 
 class AllelesDetector():
     """docstring for main"""
-    def __init__(self, counts_table, geno_table, minimum_no_of_reads):
+    def __init__(self, counts_table, geno_table, minimum_no_of_reads, PCR_free):
 
         #sorted_geno_list: sorted by abundance, 2D list => list of lists(key index 0, value 1)
         self.sorted_geno_list = (sorted(geno_table.items(), key=lambda x: x[1][0], reverse=True))
@@ -15,6 +15,7 @@ class AllelesDetector():
         self.peak_repeat_counts = peak_identifier.get_peaks()
         self.first_allele = None
         self.second_allele = None
+        self.pcr_free = PCR_free        
         self.result_summery = self.predict_alleles()
         if self.first_allele.abundance < minimum_no_of_reads:
             self.color_code = "red"
@@ -54,6 +55,13 @@ class AllelesDetector():
 
                 message += " ,two matches with one repeat count, peak may not be a true peak, please check manually"
                 self.color_code = "red"
+
+            if self.pcr_free:
+                chosen_alleles = set([matching_sequences[0].sequence_string, matching_sequences[1].sequence_string])
+                top_alleles = set([self.sorted_geno_list[0][0], self.sorted_geno_list[1][0]])
+                if chosen_alleles != top_alleles:
+                    message += " ,most abundant repeat sequences not selected, please check manually"
+                    self.color_code = "yellow"
 
             self.first_allele = matching_sequences[0]
             self.second_allele = matching_sequences[1]
@@ -145,9 +153,12 @@ class AllelesDetector():
         sequence_smaller_than_matched_seq = self.get_seq_possible_alleles_list_by_repeats_count(
                                                                 sequence_smaller_than_matched_seq_count,
                                                                     self.sorted_geno_list)
-
-        if candidate_sequence.abundance > sequence_smaller_than_matched_seq.abundance*1.1 :
-            return candidate_sequence
+        if self.pcr_free:
+            if (candidate_sequence is not None) and (candidate_sequence.abundance >= (matched_sequence.abundance*0.5)):
+                return candidate_sequence
+        else:
+            if candidate_sequence.abundance > sequence_smaller_than_matched_seq.abundance*1.1 :
+                return candidate_sequence
 
         return None
 
