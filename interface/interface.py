@@ -1,4 +1,4 @@
-from . import check_params 
+from . import check_params, json_parser
 import getopt
 import sys, os
 
@@ -27,8 +27,10 @@ def get_user_inputs(argv):
             number_of_threads = int(arg)
 
     check_params.check_input_directory(input_directory)
-    check_params.check_or_create_output_directory(output_directory)
     check_params.check_settings_file(settings_file)
+    settings = json_parser.extract_parameters(settings_file)
+    check_params.check_or_create_output_directory(output_directory, settings["additional_csv_export"])
+
     
 
-    return(input_directory, output_directory, settings_file, number_of_threads)
+    return(input_directory, output_directory, settings, number_of_threads)

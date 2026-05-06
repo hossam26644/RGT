@@ -105,5 +105,11 @@ def check_parameters(settings):
         check_3d_plot_params(settings["3D_plot_parameters"])
     except Exception as e:
         settings["3D_plot_parameters"] = None
+
+    try:
+        settings["additional_csv_export"]
+        settings["additional_csv_export"] = get_bool_value_from_string(settings["additional_csv_export"])
+    except Exception as e:
+        settings["additional_csv_export"] = False
     
     print(settings)

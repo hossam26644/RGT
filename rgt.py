@@ -5,7 +5,8 @@ from joblib import Parallel, delayed, cpu_count
 
 from filereader.ReadFile import ReadFile
 from genotyper.GenoType import Genotype, get_rev_complementry
-from excelexporter.ExcelExport import ExcelWriter
+from exporter.ExcelExport import ExcelWriter
+from exporter.csv_exporter import export_csv
 from allelesdetector.AllelesDetector import AllelesDetector
 from graphsplotter.plotter import plot_graphs
 
@@ -62,6 +63,14 @@ class RGT():
             excel_writer.add_table_to_sheet(sorted_counts_table,"counts", counts_table_titles)
             excel_writer.add_table_to_sheet(sorted_unique_counts_table,"unique counts", counts_table_titles)
             excel_writer.save_file(self.output_directory + "/FilesSpecificResults/"+sample_code+".xlsx")
+
+            if self.settings["additional_csv_export"]:
+                csv_geno_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/genotype_table/{sample_code}.csv"
+                csv_counts_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/counts_table/{sample_code}.csv"
+                csv_unique_counts_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/unique_counts_table/{sample_code}.csv"
+                export_csv(sorted_geno_table, csv_geno_table_path, header=geno_sheet_titles)
+                export_csv(sorted_counts_table, csv_counts_table_path, header=counts_table_titles)
+                export_csv(sorted_unique_counts_table, csv_unique_counts_table_path, header=counts_table_titles)
 
             #Automaticly detect allels from counts table and geom table
             a = AllelesDetector(sorted_counts_table, sorted_geno_table, self.settings["minimum_no_of_reads"], self.settings["PCR_free"])

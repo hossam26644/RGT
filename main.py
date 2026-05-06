@@ -14,8 +14,8 @@ from joblib import Parallel, delayed, cpu_count
 
 from rgt import RGT
 from interface.interface import get_user_inputs
-from interface.json_parser import extract_parameters
-from excelexporter.ExcelExport import ExcelWriter
+from exporter.ExcelExport import ExcelWriter
+from exporter.csv_exporter import export_csv
 
 
 def get_collective_dictionary_from_list_of_output_dictionaries(list_of_output_dictionaries):
@@ -31,8 +31,7 @@ def main():
     ''' gets user inputs, creats multible instances of the RGT class to analyse each sample
     and exports the summative result in an excel file
     '''
-    input_directory, output_directory, settings_file, number_of_threads = get_user_inputs(sys.argv[1:])
-    settings = extract_parameters(settings_file)
+    input_directory, output_directory, settings, number_of_threads = get_user_inputs(sys.argv[1:])
     samples = glob.glob(input_directory + "/*.fastq")
     rgt_ = RGT(settings, input_directory, output_directory)
 
@@ -51,6 +50,9 @@ def main():
     collective_excel_writer.add_table_to_sheet(output_dictionary,"results", results_headers,
                             color_table=color_code_dictionary, colored_cell_index=4)
     collective_excel_writer.save_file(output_directory + "/ResultsSummary.xlsx")
+
+    if settings["additional_csv_export"]:
+        export_csv(output_dictionary, output_directory + "/ResultsSummary.csv", header=results_headers)
 
 
 if __name__== "__main__":
