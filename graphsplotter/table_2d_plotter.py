@@ -69,3 +69,4 @@ def plot_2d_table(table, export_directory, sample_code, first_allele, second_all
 
     plt.savefig(export_directory, dpi=600)
     plt.clf()
+    plt.close()
