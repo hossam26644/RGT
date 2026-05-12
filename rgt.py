@@ -31,12 +31,10 @@ class RGT():
 
         try:
             #read file and extract sequence from between flanks
-            file = ReadFile(sample ,start_flank=self.settings["start_flank"],
-                            end_flank=self.settings["end_flank"],
-                            discard_reads_with_no_end_flank=self.settings["discard_reads_with_no_end_flank"])
-            reads = file.reads #extracted reads from between flanks
+            file = ReadFile(sample, self.settings)
+
             #genotype the reads (create counts table and repeat sequence abundance table)
-            genotype = Genotype(reads,self.settings)
+            genotype = Genotype(file.reads, self.settings)
 
             geno_table = genotype.get_geno_table() #the repeat sequence abundance table
             counts_table = genotype.get_counts_table() 
