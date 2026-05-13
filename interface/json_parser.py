@@ -73,10 +73,10 @@ def check_parameters(settings):
 
     try:
         settings["discard_reads_with_no_end_flank"]
-        settings["discard_reads_with_no_end_flank"] = get_bool_value_from_string(settings["discard_reads_with_no_end_flank"])
-        
+        if settings["discard_reads_with_no_end_flank"] != "smart":
+            settings["discard_reads_with_no_end_flank"] = get_bool_value_from_string(settings["discard_reads_with_no_end_flank"])
     except Exception as e:
-        settings["discard_reads_with_no_end_flank"] = False
+        settings["discard_reads_with_no_end_flank"] = "smart"
     try:
         int(settings["discarded_reads_flag_percentage"])
     except Exception as e:
@@ -120,4 +120,8 @@ def check_parameters(settings):
     except Exception as e:
         settings["additional_csv_export"] = False
     
+    try:
+        settings["match_singltons"]
+    except Exception as e:
+        settings["match_singltons"] = 1
     print(settings)

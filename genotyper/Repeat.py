@@ -3,26 +3,49 @@ from .SmartString import SmartString
 from .GroupingString import GroupingString
 from .revComplementry import get_rev_complementry
 
-class Repeat():
-    """docstring for Genotype"""
-    def __init__(self,read, start_index,window, plot_3d_settings=None, number_of_units=0,
-            repeat_units=["CTG"], unique_repeat_units_list=None):
+class Read():
+    def __init__(self, header=None, raw_read=None, quality_score=None):
+        self.header = header
+        self.raw_read = raw_read
+        self.quality_score = quality_score
+        self.interflanking_seq = None
+        self.start_flank_found = False
+        self.end_flank_found = False
+        self.successfully_extracted = False
+        self.repeats = []
+    
+    def state(self):
+        return {
+            "header": self.header,
+            "raw_read": self.raw_read,
+            "quality_score": self.quality_score,
+            "interflanking_seq": self.interflanking_seq,
+            "start_flank_found": self.start_flank_found,
+            "end_flank_found": self.end_flank_found,
+            "successfully_extracted": self.successfully_extracted,
+        }
         
-        self.repeat_units = repeat_units
-        self.number_of_units = number_of_units
-        self.last_unit_index = start_index + (len(window))
-        self.start_index = start_index 
+class Repeat(Read):
+    """docstring for Genotype"""
+    def __init__(self, read):
+
+        for k, v in read.state().items():
+            setattr(self, k, v)
+
+        self.repeat_units = None
+        self.number_of_units = 0
+        self.last_unit_index = None
+        self.start_index = None 
         self.single_point_mutation_indexes = []
         self.unconfirmed_units_buffer = 0
         self.non_perfect_units = 0
         self.repeat_sequence = ""
         self.unconfirmed_sequence = "" #sequence of non pure repeates waiting for a confirmed unit to  be added
-        self.unique_repeat_units_list = unique_repeat_units_list
+        self.unique_repeat_units_list = None
         self.unique_repeat_units_count = 0
-        self.read = read
-        self.plot_3d_settings = plot_3d_settings
+        self.plot_3d_settings = None
         #for 3D plots
-        if plot_3d_settings!= None:
+        if self.plot_3d_settings is not None:
             self.x_units = plot_3d_settings["x_units"]
             self.z_units = plot_3d_settings["z_units"]
             self.before_x_seq = plot_3d_settings["before_x_seq"]
@@ -38,8 +61,6 @@ class Repeat():
 
             if self.before_z_seq == None:
                 self.in_z_region_flag = True
-        #add the unit
-        self.add_unit(window, self.last_unit_index)
 
 
     def add_unit(self, window, index): #index is the last base index in the sequence
@@ -64,10 +85,7 @@ class Repeat():
         if self.plot_3d_settings!= None:
             self.add_x_count(index, window)
             self.add_z_count(index, window)
-
-
       
-
     def add_z_count(self, index, window):
         if self.check_seq_before_repeat(index-len(window), self.before_z_seq):
             self.in_z_region_flag = True
@@ -87,23 +105,21 @@ class Repeat():
             self.x_counts_for_3d += 1
 
         if self.check_seq_after_repeat(index, self.after_x_seq):
-            self.read
+            self.interflanking_seq
             self.in_x_region_flag = False
-
 
     def check_seq_before_repeat(self, window_start_index, before_seq):
         if before_seq != None:
-            if self.read[window_start_index-len(before_seq):window_start_index] == before_seq:
+            if self.interflanking_seq[window_start_index-len(before_seq):window_start_index] == before_seq:
                 return True
             else:
                 return False 
         else:
             return False
-       
     
     def check_seq_after_repeat(self, index, after_seq):
         if after_seq != None:
-            if self.read[index:index+len(after_seq)] == after_seq:
+            if self.interflanking_seq[index:index+len(after_seq)] == after_seq:
                 return True
             else:
                 return False
@@ -117,7 +133,7 @@ class Repeat():
     	return self.non_perfect_units/self.number_of_units
 
     def get_seq(self):
-    	return self.read[self.start_index:self.last_unit_index]
+    	return self.interflanking_seq[self.start_index:self.last_unit_index]
     
     def get_seq_smart_string(self, rev_strand):
         if rev_strand:
@@ -135,3 +151,7 @@ class Repeat():
             grouping_string = GroupingString.get_grouped_string_from_sequence(self.get_seq(), grouping_repeat_units)
         return grouping_string
         
+    def __eq__(self, other):
+        if isinstance(other, Repeat):
+            return self.get_seq() == other.get_seq()
+        return False

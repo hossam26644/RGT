@@ -29,7 +29,7 @@ def get_user_inputs(argv):
     check_params.check_input_directory(input_directory)
     check_params.check_settings_file(settings_file)
     settings = json_parser.extract_parameters(settings_file)
-    check_params.check_or_create_output_directory(output_directory, settings["additional_csv_export"])
+    check_params.check_or_create_output_directory(output_directory, settings)
 
     
 

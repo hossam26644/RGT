@@ -20,7 +20,7 @@ def check_number_of_threads(number_of_threads):
         print("Please enter a valid number of threads or leave blank") 
         sys.exit()
 
-def check_or_create_output_directory(output_directory, export_csv):
+def check_or_create_output_directory(output_directory, settings):
     if not os.path.isdir(output_directory):
         try:
             os.mkdir(output_directory)
@@ -43,7 +43,7 @@ def check_or_create_output_directory(output_directory, export_csv):
     if not os.path.isdir(output_directory + "/FilesSpecificResults"):
             os.mkdir(output_directory +"/FilesSpecificResults")
     
-    if export_csv:
+    if settings["additional_csv_export"]:
         if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports"):
             os.mkdir(output_directory + "/FilesSpecificResults/csv_exports")
         if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports/genotype_table"):
@@ -52,6 +52,10 @@ def check_or_create_output_directory(output_directory, export_csv):
             os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/counts_table")
         if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports/unique_counts_table"):
             os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/unique_counts_table")
+        if settings["match_singltons"]:
+            if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports/before_matching_singltons"):
+                os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/before_matching_singltons")
+        
 
 
 def check_settings_file(settings_file):

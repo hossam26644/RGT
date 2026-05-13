@@ -35,15 +35,26 @@ class RGT():
 
             #genotype the reads (create counts table and repeat sequence abundance table)
             genotype = Genotype(file.reads, self.settings)
+            ad = AllelesDetector(genotype, self.settings)
 
+            if self.settings['discard_reads_with_no_end_flank'] == 'smart':
+                # reinclude reads with no end flank if the have more repeats than the longer allele
+                max_detected_expanded = 0
+                for read in file.reads:
+                    for repeat in read.repeats:
+                        if not read.end_flank_found and repeat.number_of_units and repeat.number_of_units > ad.longer_allele_repeats_count:
+                            read.successfully_extracted = True
+                            max_detected_expanded = max(max_detected_expanded, repeat.number_of_units)
+                if max_detected_expanded:
+                    genotype = Genotype(file.reads, self.settings)
+                    ad = AllelesDetector(genotype, self.settings)
+                    ad.color_code = "red"
+                    ad.result_summery[2] += f" ,Expanded allele detected with no end flank"
+                    ad.result_summery[2] += f" ,max detected expanded allele has {max_detected_expanded} repeat units, please check manually"                          
+                        
             geno_table = genotype.get_geno_table() #the repeat sequence abundance table
             counts_table = genotype.get_counts_table() 
             unique_counts_table = genotype.get_unique_counts_table()
-
-            #sort the three tables by abundance
-            sorted_geno_table = dict(sorted(geno_table.items(), key=lambda x: x[1], reverse=True))
-            sorted_counts_table = dict(sorted(counts_table.items(), key=lambda x: x[1], reverse=True))
-            sorted_unique_counts_table = dict(sorted(unique_counts_table.items(), key=lambda x: x[1], reverse=True))
 
             #write three tabels to excel 
             excel_writer = ExcelWriter()
@@ -57,29 +68,34 @@ class RGT():
                                 "Number of repeat units",xlabel , zlabel, "Number of unique repeat units", "Raw sequence structure"]
             counts_table_titles = ["Number of repeat units", "Abundance"]
 
-            excel_writer.add_table_to_sheet(sorted_geno_table,"genotype", geno_sheet_titles)
-            excel_writer.add_table_to_sheet(sorted_counts_table,"counts", counts_table_titles)
-            excel_writer.add_table_to_sheet(sorted_unique_counts_table,"unique counts", counts_table_titles)
+            excel_writer.add_table_to_sheet(geno_table,"genotype", geno_sheet_titles)
+            if self.settings["match_singltons"]:
+                excel_writer.add_table_to_sheet(genotype.before_matching_table,"before_matching_singltons", geno_sheet_titles)
+            excel_writer.add_table_to_sheet(counts_table,"counts", counts_table_titles)
+            excel_writer.add_table_to_sheet(unique_counts_table,"unique counts", counts_table_titles)
             excel_writer.save_file(self.output_directory + "/FilesSpecificResults/"+sample_code+".xlsx")
 
             if self.settings["additional_csv_export"]:
                 csv_geno_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/genotype_table/{sample_code}.csv"
                 csv_counts_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/counts_table/{sample_code}.csv"
                 csv_unique_counts_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/unique_counts_table/{sample_code}.csv"
-                export_csv(sorted_geno_table, csv_geno_table_path, header=geno_sheet_titles)
-                export_csv(sorted_counts_table, csv_counts_table_path, header=counts_table_titles)
-                export_csv(sorted_unique_counts_table, csv_unique_counts_table_path, header=counts_table_titles)
+                export_csv(geno_table, csv_geno_table_path, header=geno_sheet_titles)
+                export_csv(counts_table, csv_counts_table_path, header=counts_table_titles)
+                export_csv(unique_counts_table, csv_unique_counts_table_path, header=counts_table_titles)
+                if self.settings["match_singltons"]:
+                    csv_before_matching_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/before_matching_singltons/{sample_code}.csv"
+                    export_csv(genotype.before_matching_table, csv_before_matching_table_path, header=geno_sheet_titles)
+
 
             #Automaticly detect allels from counts table and geom table
-            a = AllelesDetector(sorted_counts_table, sorted_geno_table, self.settings["minimum_no_of_reads"], self.settings["PCR_free"])
-            output_table[sample_code] = a.result_summery
+            output_table[sample_code] = ad.result_summery
             discarded_reads_percentage = file.get_discarded_reads_percentage()
             output_table[sample_code].append(str(round(discarded_reads_percentage, 1)))
 
             #export plot
-            plot_graphs(self.settings, genotype,self.output_directory, sample_code, a.first_allele, a.second_allele, a.color_code)
+            plot_graphs(self.settings, genotype, self.output_directory, sample_code, ad.first_allele, ad.second_allele, ad.color_code)
 
-            color_table[sample_code] = {4:a.color_code}
+            color_table[sample_code] = {4:ad.color_code}
             self.color_code_discarded_reads_percntg(color_table, discarded_reads_percentage,sample_code)
 
         except Exception as e:
