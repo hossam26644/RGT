@@ -55,8 +55,6 @@ class Genotype():
         self.table_3d = {}
         if self.settings["match_singltons"]: self.before_matching_table = {}
 
-
-
     def genotype_repeats(self):
         genotyped_repeats = []
         for read in self.reads:
@@ -110,7 +108,6 @@ class Genotype():
         self.before_matching_table = before_matching_table
         for repeat in filtered_matched_repeats:
             self.add_repeat_to_tables(repeat)
-
 
     def get_line_repeates(self, read):
         genotyped_repeats = []
@@ -199,11 +196,6 @@ class Genotype():
             return True, similar_seq
         return False, ""
 
-    def hamming_distance(self,s1, s2):
-        if len(s1) != len(s2):
-            return -1
-        return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
-
     def add_repeat_to_tables(self, repeat):
         self.add_repeat_to_genotable(repeat)
         self.add_repeat_to_countstable(repeat)
@@ -276,6 +268,12 @@ class Genotype():
         return(list_of_repeat_units_lengths)
 
     @staticmethod
+    def hamming_distance(s1, s2):
+        if len(s1) != len(s2):
+            return -1
+        return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
+
+    @staticmethod
     def levenshtein(a: str, b: str) -> int:
         m, n = len(a), len(b)
         dp = list(range(n + 1))
@@ -284,3 +282,4 @@ class Genotype():
             for j, cb in enumerate(b, 1):
                 prev, dp[j] = dp[j], min(dp[j] + 1, dp[j-1] + 1, prev + (ca != cb))
         return dp[n]
+
