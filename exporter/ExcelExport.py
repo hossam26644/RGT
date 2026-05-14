@@ -2,6 +2,7 @@
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 from string import ascii_lowercase
+import pandas as pd
 
 class ExcelWriter():
     """docstring for ClassName"""
@@ -34,6 +35,19 @@ class ExcelWriter():
             
             row+=1
 
+        self.cols_adjust_size(ws, header_list)
+
+    def add_pd_to_sheet(self, pd_table, sheet_name):
+        ws = self.wb.create_sheet(sheet_name)
+        ws.title = sheet_name
+        
+        header_list = list(pd_table.columns)
+        self.write_table_header(ws, header_list)
+        
+        for row_idx, row in enumerate(pd_table.itertuples(index=False), start=2):
+            for col_idx, val in enumerate(row, start=1):
+                ws.cell(row=row_idx, column=col_idx, value=val)
+        
         self.cols_adjust_size(ws, header_list)
 
     def apply_color_to_cells(self,ws,sample_color_table,row):

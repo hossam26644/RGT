@@ -100,13 +100,13 @@ def check_parameters(settings):
         else:
             settings["minimum_no_of_reads"] = 30
     try:
-        settings["number_of_allowed_frwrd_flank_point_mutations"]
+        settings["number_of_allowed_strt_flank_point_mutations"]
     except Exception as e:
-        settings["number_of_allowed_frwrd_flank_point_mutations"] = 1
+        settings["number_of_allowed_strt_flank_point_mutations"] = 1
     try:
-        settings["number_of_allowed_bcwrd_flank_point_mutations"]
+        settings["number_of_allowed_end_flank_point_mutations"]
     except Exception as e:
-        settings["number_of_allowed_bcwrd_flank_point_mutations"] = 1
+        settings["number_of_allowed_end_flank_point_mutations"] = 1
 
     try:
         settings["3D_plot_parameters"]

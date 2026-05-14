@@ -52,6 +52,8 @@ def check_or_create_output_directory(output_directory, settings):
             os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/counts_table")
         if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports/unique_counts_table"):
             os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/unique_counts_table")
+        if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports/flanking_seq_table"):
+            os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/flanking_seq_table")
         if settings["match_singltons"]:
             if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports/before_matching_singltons"):
                 os.mkdir(output_directory + "/FilesSpecificResults/csv_exports/before_matching_singltons")

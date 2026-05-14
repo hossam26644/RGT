@@ -12,6 +12,8 @@ class Read():
         self.start_flank_found = False
         self.end_flank_found = False
         self.successfully_extracted = False
+        self.start_flank_seq = None
+        self.end_flank_seq = None        
         self.repeats = []
     
     def state(self):
@@ -23,8 +25,27 @@ class Read():
             "start_flank_found": self.start_flank_found,
             "end_flank_found": self.end_flank_found,
             "successfully_extracted": self.successfully_extracted,
+            "start_flank_seq": self.start_flank_seq,
+            "end_flank_seq": self.end_flank_seq,
         }
-        
+    
+    @staticmethod
+    def hamming_distance(s1, s2):
+        if len(s1) != len(s2):
+            return -1
+        return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
+
+    @staticmethod
+    def levenshtein(a: str, b: str) -> int:
+        m, n = len(a), len(b)
+        dp = list(range(n + 1))
+        for i, ca in enumerate(a, 1):
+            prev, dp[0] = dp[0], i
+            for j, cb in enumerate(b, 1):
+                prev, dp[j] = dp[j], min(dp[j] + 1, dp[j-1] + 1, prev + (ca != cb))
+        return dp[n]
+
+   
 class Repeat(Read):
     """docstring for Genotype"""
     def __init__(self, read):

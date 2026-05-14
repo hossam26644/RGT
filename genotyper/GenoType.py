@@ -45,7 +45,7 @@ class Genotype():
         self.unique_counts_table = {}
         self.table_3d = {}
         if self.settings["match_singltons"]: self.before_matching_table = {}
-
+        self.repeats = []
         self.genotype_repeats()
 
     def clear_tables(self):
@@ -60,13 +60,21 @@ class Genotype():
         for read in self.reads:
             if read.interflanking_seq is not None:
                 genotyped_repeats.extend(self.get_line_repeates(read))
-        for repeat in genotyped_repeats: 
-            self.add_repeat_to_tables(repeat)
+                   
 
         if self.settings["match_singltons"]:
-            self.match_singltons(genotyped_repeats)
+            filtered_repeats = self.match_singltons(genotyped_repeats)         
+            self.repeats = filtered_repeats
+        else:
+            self.repeats = genotyped_repeats
+        
+        for repeat in self.repeats: 
+            self.add_repeat_to_tables(repeat)        
 
     def match_singltons(self, genotyped_repeats):
+        self.clear_tables()
+        for repeat in genotyped_repeats:
+            self.add_repeat_to_genotable(repeat)
         geno_table = self.get_geno_table()
         
         good_sequences = {k: v for k, v in geno_table.items() if v[0] > 1}
@@ -89,7 +97,7 @@ class Genotype():
                 seq = next(
                     (seq for n in range(self.settings["match_singltons"])
                         for seq in good_sequences_sorted
-                        if self.levenshtein(seq, repeat.get_seq()) == n + 1),
+                        if Repeat.levenshtein(seq, repeat.get_seq()) == n + 1),
                     None
                 )
 
@@ -106,8 +114,8 @@ class Genotype():
         before_matching_table = copy.deepcopy(self.geno_table)     
         self.clear_tables()
         self.before_matching_table = before_matching_table
-        for repeat in filtered_matched_repeats:
-            self.add_repeat_to_tables(repeat)
+        
+        return filtered_matched_repeats
 
     def get_line_repeates(self, read):
         genotyped_repeats = []
@@ -189,7 +197,7 @@ class Genotype():
             for repeat_unit in self.repeat_units:
                 if window == repeat_unit:
                     return True, window
-                elif repeat_object != None and self.hamming_distance(window, repeat_unit)==1:
+                elif repeat_object != None and Repeat.hamming_distance(window, repeat_unit)==1:
                     if similar_seq == "":
                         similar_seq = window
         if similar_seq != "":
@@ -267,19 +275,8 @@ class Genotype():
        
         return(list_of_repeat_units_lengths)
 
-    @staticmethod
-    def hamming_distance(s1, s2):
-        if len(s1) != len(s2):
-            return -1
-        return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
-
-    @staticmethod
-    def levenshtein(a: str, b: str) -> int:
-        m, n = len(a), len(b)
-        dp = list(range(n + 1))
-        for i, ca in enumerate(a, 1):
-            prev, dp[0] = dp[0], i
-            for j, cb in enumerate(b, 1):
-                prev, dp[j] = dp[j], min(dp[j] + 1, dp[j-1] + 1, prev + (ca != cb))
-        return dp[n]
-
+    def get_discarded_reads_percentage(self):
+        percentage = len(self.reads) - sum([v[0] for k,v in self.geno_table.items()])
+        percentage /= len(self.reads)
+        percentage *= 100
+        return percentage  

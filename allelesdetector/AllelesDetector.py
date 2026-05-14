@@ -1,6 +1,9 @@
 '''docstring'''
 from .PeakIdentifier import PeakIdentifier
 from .MatchingSequence import MatchingSequence
+import pandas as pd
+from collections import Counter
+
 
 class AllelesDetector():
     """docstring for main"""
@@ -17,6 +20,8 @@ class AllelesDetector():
         self.peak_repeat_counts = peak_identifier.get_peaks()
         self.first_allele = None
         self.second_allele = None
+
+
         self.result_summery = self.predict_alleles()
         if self.first_allele.abundance < self.settings["minimum_no_of_reads"]:
             self.color_code = "red"
@@ -27,6 +32,14 @@ class AllelesDetector():
 
         if self.settings['discard_reads_with_no_end_flank'] == True:
             self.check_no_expanded_alleles_with_no_end_flank()
+
+        self.flanking_sequence_table = None
+        self.allele1_most_common_start_flank = None
+        self.allele1_most_common_end_flank = None
+        self.allele2_most_common_start_flank = None
+        self.allele2_most_common_end_flank = None
+        
+        self.report_allele_flanking_sequences()
                    
 
     def predict_alleles(self):
@@ -208,8 +221,7 @@ class AllelesDetector():
     def get_seq_possible_alleles_list_by_repeats_count(self, count, given_list):
         for idx, possibe_allele in enumerate(given_list):
             if (possibe_allele[1][1]) == count:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                                idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4] )
+                matching_sequence = MatchingSequence(possibe_allele, idx)
                 return matching_sequence
         return None
 
@@ -220,8 +232,7 @@ class AllelesDetector():
         
         for idx, possibe_allele in enumerate(self.sorted_geno_list):
             if (possibe_allele[1][1]) in repeat_counts_bigger_than_detected_allele:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                    idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4])
+                matching_sequence = MatchingSequence(possibe_allele, idx)
                 return matching_sequence
         return MatchingSequence("can't find the other allele", 0, 0, 0, 0) #this line should be impossible to reach
 
@@ -245,8 +256,8 @@ class AllelesDetector():
         #checking if a match happens with the near by points, now identified as new peaks
         for idx, possibe_allele in enumerate(self.possible_alleles_list):
             if (possibe_allele[1][1]) in new_peak_repeat_counts:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                                idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4])
+                matching_sequence = MatchingSequence(possibe_allele, idx)
+
                 new_matching_sequences.append(matching_sequence)
         return new_matching_sequences
         
@@ -255,8 +266,7 @@ class AllelesDetector():
         matching_sequences = []
         for idx, possibe_allele in enumerate(self.possible_alleles_list):
             if possibe_allele[1][1] in self.peak_repeat_counts:
-                matching_sequence = MatchingSequence(possibe_allele[0], possibe_allele[1][1], possibe_allele[1][0],
-                                idx, possibe_allele[1][2], possibe_allele[1][3], possibe_allele[1][4])
+                matching_sequence = MatchingSequence(possibe_allele, idx)
                 matching_sequences.append(matching_sequence)
         return matching_sequences
     
@@ -294,3 +304,50 @@ class AllelesDetector():
             self.result_summery[2] += f" ,Expanded allele detected with no end flank"
             self.result_summery[2] += f" ,max detected expanded allele has {max_detected_expanded} repeat units, please check manually"
 
+    def report_allele_flanking_sequences(self):
+        counts1 = self._count_flanks(self.first_allele, self.genotype.reads)
+        counts2 = self._count_flanks(self.second_allele, self.genotype.reads)
+
+        def _most_common(counter):
+            return counter.most_common(1)[0][0] if counter else None
+
+        self.flanking_sequence_table = pd.concat([
+            self._counts_to_df(self.first_allele, counts1),
+            self._counts_to_df(self.second_allele, counts2)
+        ], axis=1)
+
+        self.allele1_most_common_start_flank = _most_common(counts1["start"])
+        self.allele1_most_common_end_flank   = _most_common(counts1["end"])
+        self.allele2_most_common_start_flank = _most_common(counts2["start"])
+        self.allele2_most_common_end_flank   = _most_common(counts2["end"])      
+    
+        self.result_summery.extend([
+            self.allele1_most_common_start_flank,
+            self.allele1_most_common_end_flank,
+            self.allele2_most_common_start_flank,
+            self.allele2_most_common_end_flank
+        ])
+    
+    def _counts_to_df(self, allele: MatchingSequence, counts: dict) -> pd.DataFrame:
+        frames = []
+        for position in ("start", "end"):
+            df = pd.DataFrame(
+                counts[position].items(),
+                columns=[f"{allele.sequence_string} {position} flank structures",
+                        f"{allele.sequence_string} {position} flank abundance"]
+            )
+            frames.append(df)
+        return pd.concat(frames, axis=1)
+
+    def _count_flanks(self, allele: MatchingSequence, reads) -> dict:
+
+        """Returns {position: Counter} for 'start' and 'end' flanks of given allele."""
+        counts = {"start": Counter(), "end": Counter()}
+        for repeat in self.genotype.repeats:
+            if repeat.repeat_sequence != allele.raw_seq:
+                continue
+            if repeat.start_flank_found:
+                counts["start"][repeat.start_flank_seq] += 1
+            if repeat.end_flank_found:
+                counts["end"][repeat.end_flank_seq] += 1
+        return counts
