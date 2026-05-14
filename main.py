@@ -37,6 +37,9 @@ def main():
 
     if number_of_threads == None:
         number_of_threads = min(cpu_count(), len(samples))
+    else:
+        number_of_threads = min(number_of_threads, len(samples))
+        
     result = Parallel(n_jobs=number_of_threads, verbose=1)(map(delayed(rgt_.rgt),(samples)))
     
     automated_genotyope = [i[0] for i in result]
