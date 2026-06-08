@@ -130,4 +130,9 @@ def check_parameters(settings):
     except Exception as e:
         settings["report_consensus_flanking_sequence"] = False
     
+    try:
+        float(settings["min_peak_percentage_threshold"])
+    except Exception as e:
+        settings["min_peak_percentage_threshold"] = 0.2
+
     print(settings)

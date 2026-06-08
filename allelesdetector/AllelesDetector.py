@@ -279,9 +279,9 @@ class AllelesDetector():
         
         # minimum threshold for identifing a repeat sequence as possible allele
         if self.pcr_free:
-            min_threshold_abundance = 1
+            min_threshold_abundance = 1 #one read
         else:
-            min_threshold_abundance = most_abundant_allele_values[0] * 0.2
+            min_threshold_abundance = most_abundant_allele_values[0] * self.settings["min_peak_percentage_threshold"]
 
         for i in range(0,len(self.sorted_geno_list)):
             #first index the repeat, second the values, third the repeat count   
