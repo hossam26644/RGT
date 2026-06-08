@@ -135,4 +135,11 @@ def check_parameters(settings):
     except Exception as e:
         settings["min_peak_percentage_threshold"] = 0.2
 
+    try:
+        settings["plot_waterfalls"]
+        settings["plot_waterfalls"] = get_bool_value_from_string(settings["plot_waterfalls"])
+    except Exception as e:
+        settings["plot_waterfalls"] = False
+
+
     print(settings)

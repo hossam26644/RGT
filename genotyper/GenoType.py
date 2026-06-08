@@ -69,7 +69,9 @@ class Genotype():
             self.repeats = genotyped_repeats
         
         for repeat in self.repeats: 
-            self.add_repeat_to_tables(repeat)        
+            if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
+                repeat.discarded = False
+                self.add_repeat_to_tables(repeat)        
 
     def match_singltons(self, genotyped_repeats):
         self.clear_tables()
@@ -212,49 +214,45 @@ class Genotype():
             self.add_repeat_to_table3d(repeat)
 
     def add_repeat_to_table3d(self, repeat):
-        if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
-            key = (repeat.x_counts_for_3d, repeat.z_counts_for_3d)
-            if key in self.table_3d:
-               self.table_3d[key] += 1
-            else:
-                self.table_3d[key] = 1
+        key = (repeat.x_counts_for_3d, repeat.z_counts_for_3d)
+        if key in self.table_3d:
+            self.table_3d[key] += 1
+        else:
+            self.table_3d[key] = 1
 
     def add_repeat_to_genotable(self, repeat):
-        if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
-            if self.grouping_repeat_units == None:
-                repeat_sequence = repeat.get_seq_smart_string(self.reverse_strand)
+        if self.grouping_repeat_units == None:
+            repeat_sequence = repeat.get_seq_smart_string(self.reverse_strand)
+        else:
+            repeat_sequence = repeat.get_grouped_string(self.grouping_repeat_units,self.reverse_strand)
+        
+        if(repeat_sequence in self.geno_table):
+            self.geno_table[repeat_sequence][0] += 1
+        else:
+            if self.settings["3D_plot_parameters"]!= None:
+                self.geno_table[repeat_sequence] = [1,repeat.number_of_units,
+                    repeat.x_counts_for_3d, repeat.z_counts_for_3d,
+                    repeat.unique_repeat_units_count,repeat.get_seq()]
             else:
-                repeat_sequence = repeat.get_grouped_string(self.grouping_repeat_units,self.reverse_strand)
-            
-            if(repeat_sequence in self.geno_table):
-                self.geno_table[repeat_sequence][0] += 1
-            else:
-                if self.settings["3D_plot_parameters"]!= None:
-                    self.geno_table[repeat_sequence] = [1,repeat.number_of_units,
-                        repeat.x_counts_for_3d, repeat.z_counts_for_3d,
-                        repeat.unique_repeat_units_count,repeat.get_seq()]
-                else:
-                    self.geno_table[repeat_sequence] = [1,repeat.number_of_units,
-                        "not applicable", "not applicable",
-                        repeat.unique_repeat_units_count,repeat.get_seq()]
+                self.geno_table[repeat_sequence] = [1,repeat.number_of_units,
+                    "not applicable", "not applicable",
+                    repeat.unique_repeat_units_count,repeat.get_seq()]
 
     def add_repeat_to_countstable(self, repeat):
-        if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
-            number_of_repeat_units = repeat.number_of_units
-           
-            if(number_of_repeat_units in self.counts_table):
-                self.counts_table[number_of_repeat_units] += 1
-            else:
-                self.counts_table[number_of_repeat_units] = 1
+        number_of_repeat_units = repeat.number_of_units
+        
+        if(number_of_repeat_units in self.counts_table):
+            self.counts_table[number_of_repeat_units] += 1
+        else:
+            self.counts_table[number_of_repeat_units] = 1
 
     def add_repeat_to_unique_countstable(self, repeat):
-        if repeat.get_non_perfect_units_percentage() <= 0.3: #only add repeates with unique percentage > 0.3
-            number_of_unique_repeat_units = repeat.unique_repeat_units_count
-           
-            if(number_of_unique_repeat_units in self.unique_counts_table):
-                self.unique_counts_table[number_of_unique_repeat_units] += 1
-            else:
-                self.unique_counts_table[number_of_unique_repeat_units] = 1
+        number_of_unique_repeat_units = repeat.unique_repeat_units_count
+        
+        if(number_of_unique_repeat_units in self.unique_counts_table):
+            self.unique_counts_table[number_of_unique_repeat_units] += 1
+        else:
+            self.unique_counts_table[number_of_unique_repeat_units] = 1
 
     def get_geno_table(self):
         return dict(sorted(self.geno_table.items(), key=lambda x: x[1], reverse=True))        

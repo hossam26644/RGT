@@ -42,12 +42,18 @@ def check_or_create_output_directory(output_directory, settings):
         os.mkdir(output_directory +"/Plots/total-counts-plots/")
     if not os.path.isdir(output_directory + "/Plots/specified-units-count-plots/"):
         os.mkdir(output_directory +"/Plots/specified-units-count-plots/")
-    if not os.path.isdir(output_directory + "/Plots/3d_plots/"):
-        os.mkdir(output_directory +"/Plots/3d_plots/")
 
     if not os.path.isdir(output_directory + "/FilesSpecificResults"):
             os.mkdir(output_directory +"/FilesSpecificResults")
     
+    if settings["3D_plot_parameters"] is not None:
+        if not os.path.isdir(output_directory + "/Plots/3d_plots/"):
+            os.mkdir(output_directory +"/Plots/3d_plots/")        
+
+    if settings["plot_waterfalls"]:
+        os.mkdir(output_directory +"/Plots/waterfalls")
+
+
     if settings["additional_csv_export"]:
         if not os.path.isdir(output_directory + "/FilesSpecificResults/csv_exports"):
             os.mkdir(output_directory + "/FilesSpecificResults/csv_exports")

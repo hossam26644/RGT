@@ -69,6 +69,7 @@ class Repeat(Read):
         self.unique_repeat_units_list = None
         self.unique_repeat_units_count = 0
         self.plot_3d_settings = None
+        self.discarded = True
         #for 3D plots
         if self.plot_3d_settings is not None:
             self.x_units = plot_3d_settings["x_units"]

@@ -1,6 +1,7 @@
 '''docstring'''
 from .table_2d_plotter import plot_2d_table
 from .plot_3D import plot_3D
+from .waterfall import draw_waterfall
 
 def plot_graphs(settings, genotype,output_directory, sample_code, first_allele, second_allele, color_code):
     
@@ -25,6 +26,18 @@ def plot_graphs(settings, genotype,output_directory, sample_code, first_allele, 
         first_allele, second_allele,
         first_allele_count, second_allele_count,xlabel, color_code=color_code)
 
+    #plot waterfall
+    if settings["plot_waterfalls"]:
+        reads = [r.interflanking_seq for r in genotype.repeats if not r.discarded]
+        plot_directory = output_directory+ "/Plots/waterfalls/"+sample_code+".png"
+
+        draw_waterfall(
+            reads,
+            settings,
+            sample_code,
+            plot_directory
+        )
+    
     #plot the 3D plot
     try:
         if settings["3D_plot_parameters"] != None:
