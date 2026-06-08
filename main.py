@@ -10,7 +10,8 @@ analysis for each file
 '''
 import sys
 import glob
-from joblib import Parallel, delayed, cpu_count
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from os import cpu_count
 
 from rgt import RGT
 from interface.interface import get_user_inputs
@@ -44,9 +45,16 @@ def main():
         number_of_threads = min(cpu_count(), len(samples))
     else:
         number_of_threads = min(number_of_threads, len(samples))
+   
+    with ProcessPoolExecutor(max_workers=number_of_threads) as executor:
+        futures = {executor.submit(rgt_.rgt, s): i for i, s in enumerate(samples)}
+        result = [None] * len(samples)
+        for done_count, future in enumerate(as_completed(futures), 1):
+            idx = futures[future]
+            result[idx] = future.result()
+            if done_count % 10 == 0 or done_count == len(samples):
+                print(f"[{done_count}/{len(samples)}] samples processed")
 
-    result = Parallel(n_jobs=number_of_threads, verbose=1)(map(delayed(rgt_.rgt),(samples)))
-    
     automated_genotyope = [i[0] for i in result]
     color_table = [i[1] for i in result]
     
