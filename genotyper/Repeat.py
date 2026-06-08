@@ -15,7 +15,9 @@ class Read():
         self.start_flank_seq = None
         self.end_flank_seq = None        
         self.repeats = []
-    
+        self.pre_repeat_structure = None
+        self.post_repeat_structure = None
+
     def state(self):
         return {
             "header": self.header,
@@ -27,6 +29,8 @@ class Read():
             "successfully_extracted": self.successfully_extracted,
             "start_flank_seq": self.start_flank_seq,
             "end_flank_seq": self.end_flank_seq,
+            "pre_repeat_structure": self.pre_repeat_structure,
+            "post_repeat_structure": self.post_repeat_structure
         }
     
     @staticmethod

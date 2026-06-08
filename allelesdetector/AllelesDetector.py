@@ -39,7 +39,10 @@ class AllelesDetector():
         self.allele2_most_common_start_flank = None
         self.allele2_most_common_end_flank = None
         
-        self.report_allele_flanking_sequences()
+        if settings["report_consensus_flanking_sequence"]:
+            self.report_consensus_flanking_sequence()
+        else:
+            self.report_allele_flanking_sequences()
                    
 
     def predict_alleles(self):
@@ -304,28 +307,85 @@ class AllelesDetector():
             self.result_summery[2] += f" ,Expanded allele detected with no end flank"
             self.result_summery[2] += f" ,max detected expanded allele has {max_detected_expanded} repeat units, please check manually"
 
-    def report_allele_flanking_sequences(self):
-        counts1 = self._count_flanks(self.first_allele, self.genotype.reads)
-        counts2 = self._count_flanks(self.second_allele, self.genotype.reads)
+    def report_consensus_flanking_sequence(self):
+        """ for repeats making allele1 and allele 2 get every
+            allele.pre_repeat_structure and allele.post_repeat_structure
+            then align the pre_repeat structure of each allele by the right most
+            base (as there will be shorter fragments), and align the post_repeat 
+            structure of each allele by the left most base (as there will be shorter fragments)
+            Then, at each position, identify the most common base and construct a consensus 
+            sequence for the pre_repeat_structure and post_repeat_structure of each allele.
+        """
+        def consensus(sequences, align_right=False):
+            if not sequences:
+                return ""
+            max_len = max(len(s) for s in sequences)
+            padded = [s.rjust(max_len) if align_right else s.ljust(max_len) for s in sequences]
+            result = []
+            for i in range(max_len):
+                col = Counter(s[i] for s in padded if s[i] != ' ')
+                if not col:
+                    result.append(' ')
+                elif len(col) > 1 and col.most_common(2)[0][1] == col.most_common(2)[1][1]:
+                    result.append('*')
+                else:
+                    result.append(col.most_common(1)[0][0])
+            return ''.join(result)
+        
+        def collect(allele):
+            pre, post = [], []
+            for r in self.genotype.repeats:
+                if r.repeat_sequence != allele.raw_seq:
+                    continue
+                if r.start_flank_found:
+                    pre.append(r.pre_repeat_structure)
+                if r.end_flank_found:
+                    post.append(r.post_repeat_structure)
+            return {"pre": Counter(pre), "post": Counter(post)}
 
-        def _most_common(counter):
-            return counter.most_common(1)[0][0] if counter else None
+        frames = []
+        for allele in (self.first_allele, self.second_allele):
+            counts = collect(allele)
+            seqs_pre = list(counts["pre"].elements())
+            seqs_post = list(counts["post"].elements())
+            allele.pre_repeat_consensus = consensus(seqs_pre, align_right=True)
+            allele.post_repeat_consensus = consensus(seqs_post, align_right=False)
+
+            for position, counter in counts.items():
+                df = pd.DataFrame(
+                    counter.items(),
+                    columns=[f"{allele.sequence_string} {position} flank structures",
+                            f"{allele.sequence_string} {position} flank abundance"]
+                )
+                frames.append(df)
+
+        self.flanking_sequence_table = pd.concat(frames, axis=1)
+
+        self.result_summery.extend([
+            self.first_allele.pre_repeat_consensus,
+            self.first_allele.post_repeat_consensus,
+            self.second_allele.pre_repeat_consensus,
+            self.second_allele.post_repeat_consensus,
+        ])
+                
+                        
+    def report_allele_flanking_sequences(self):
+        for allele in (self.first_allele, self.second_allele):
+            counts = self._count_flanks(allele, self.genotype.reads)
+            allele.most_common_start_flank = counts["start"].most_common(1)[0][0] if counts["start"] else None
+            allele.most_common_end_flank = counts["end"].most_common(1)[0][0] if counts["end"] else None
+            allele._flank_counts = counts
 
         self.flanking_sequence_table = pd.concat([
-            self._counts_to_df(self.first_allele, counts1),
-            self._counts_to_df(self.second_allele, counts2)
+            self._counts_to_df(a, a._flank_counts)
+            for a in (self.first_allele, self.second_allele)
         ], axis=1)
 
-        self.allele1_most_common_start_flank = _most_common(counts1["start"])
-        self.allele1_most_common_end_flank   = _most_common(counts1["end"])
-        self.allele2_most_common_start_flank = _most_common(counts2["start"])
-        self.allele2_most_common_end_flank   = _most_common(counts2["end"])      
-    
         self.result_summery.extend([
-            self.allele1_most_common_start_flank,
-            self.allele1_most_common_end_flank,
-            self.allele2_most_common_start_flank,
-            self.allele2_most_common_end_flank
+            self.first_allele.most_common_start_flank,
+            self.first_allele.most_common_end_flank,
+            self.second_allele.most_common_start_flank,
+            self.second_allele.most_common_end_flank,
         ])
     
     def _counts_to_df(self, allele: MatchingSequence, counts: dict) -> pd.DataFrame:

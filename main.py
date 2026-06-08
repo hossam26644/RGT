@@ -48,13 +48,20 @@ def main():
     output_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(automated_genotyope)
     color_code_dictionary = get_collective_dictionary_from_list_of_output_dictionaries(color_table)
     collective_excel_writer = ExcelWriter()
+    
+    if settings["report_consensus_flanking_sequence"]: header_flank_text = [f"consensus {f} flanks structure" for f in ["start","end"]]
+    else: header_flank_text = [f"most common {f} flank" for f in ["start","end"]]
+    
     results_headers = ["sample ID", "First allele structure", "Second allele structure",
                         "Comments and Flags", "Identified peaks",
-                        "allele1 most common start flank", "allele1 most common end flank",
-                        "allele2 most common start flank", "allele2 most common end flank",
+                        f"Allele 1 {header_flank_text[0]}", f"Allele 1 {header_flank_text[1]}",
+                        f"Allele 2 {header_flank_text[0]}", f"Allele 2 {header_flank_text[1]}",
                         "Reads with no identified flanks %", "Discarded reads percentage %"]
+    
     collective_excel_writer.add_table_to_sheet(output_dictionary,"results", results_headers,
-                            color_table=color_code_dictionary, colored_cell_index=4)
+                            color_table=color_code_dictionary, colored_cell_index=4, align_right_index=[6,8],
+                            color_odd_element_index=[6,7,8,9])
+
     collective_excel_writer.save_file(output_directory + "/ResultsSummary.xlsx")
 
     if settings["additional_csv_export"]:

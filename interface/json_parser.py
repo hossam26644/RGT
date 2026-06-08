@@ -124,4 +124,10 @@ def check_parameters(settings):
         settings["match_singltons"]
     except Exception as e:
         settings["match_singltons"] = 1
+
+    try:
+        int(settings["report_consensus_flanking_sequence"])
+    except Exception as e:
+        settings["report_consensus_flanking_sequence"] = False
+    
     print(settings)

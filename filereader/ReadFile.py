@@ -6,6 +6,7 @@ class ReadFile():
    
     def __init__(self, filename, settings):
        
+        self.settings = settings
         self.start_flank = settings["start_flank"]
         self.end_flank = settings["end_flank"]
         self.number_of_allowed_strt_flank_point_mutations = settings["number_of_allowed_strt_flank_point_mutations"]
@@ -73,6 +74,15 @@ class ReadFile():
         read.end_flank_seq = rr[seq_end_index:end_flank_end]
         read.interflanking_seq = rr[seq_start_index:seq_end_index]
         read.quality_score = read.quality_score[seq_start_index:seq_end_index]
+
+        if self.settings["report_consensus_flanking_sequence"]:
+            start_len = seq_start_index - self.settings["report_consensus_flanking_sequence"]
+            start_len = max(0, start_len)
+            read.pre_repeat_structure = rr[start_len:seq_start_index]
+
+            end_len = seq_end_index + self.settings["report_consensus_flanking_sequence"]
+            end_len = min(len(rr), end_len)
+            read.post_repeat_structure = rr[seq_end_index:end_len]
 
         if read.end_flank_found or not self.discard_reads_with_no_end_flank:
             read.successfully_extracted = True

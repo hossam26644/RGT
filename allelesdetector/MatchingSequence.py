@@ -12,6 +12,10 @@ class MatchingSequence():
         self.x_count = geno_table_element[1][2] 
         self.z_count = geno_table_element[1][3]
         self.raw_seq = geno_table_element[1][5]
+        self.most_common_start_flank = None
+        self.most_common_end_flank = None
+        self.pre_repeat_consensus = None
+        self.post_repeat_consensus = None
    
     def __eq__(self, other): 
         if not isinstance(other, MatchingSequence):
