@@ -99,7 +99,7 @@ class RGT():
 
         excel_writer.add_table_to_sheet(geno_table,"genotype", geno_sheet_titles)
         excel_writer.add_pd_to_sheet(flanking_seq_table, "flanking sequences")
-        if self.settings["match_singltons"]:
+        if self.settings["match_singletons"]:
             excel_writer.add_table_to_sheet(genotype.before_matching_table,"before_matching_singltons", geno_sheet_titles)
         excel_writer.add_table_to_sheet(counts_table,"counts", counts_table_titles)
         excel_writer.add_table_to_sheet(unique_counts_table,"unique counts", counts_table_titles)
@@ -114,7 +114,7 @@ class RGT():
             export_csv(counts_table, csv_counts_table_path, header=counts_table_titles)
             export_csv(unique_counts_table, csv_unique_counts_table_path, header=counts_table_titles)
             flanking_seq_table.to_csv(csv_flanking_seq_table_path, index=False)
-            if self.settings["match_singltons"]:
+            if self.settings["match_singletons"]:
                 csv_before_matching_table_path = f"{self.output_directory}/FilesSpecificResults/csv_exports/before_matching_singltons/{sample_code}.csv"
                 export_csv(genotype.before_matching_table, csv_before_matching_table_path, header=geno_sheet_titles)
 

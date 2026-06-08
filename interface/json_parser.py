@@ -62,9 +62,9 @@ def check_parameters(settings):
         settings["grouping_repeat_units"] = None
     
     try:
-        settings["min_size_repeate"]
+        settings["min_size_repeat"]
     except Exception as e:
-        settings["min_size_repeate"] = 5
+        settings["min_size_repeat"] = 5
 
     try:
         settings["max_interrupt_tract"]
@@ -121,9 +121,9 @@ def check_parameters(settings):
         settings["additional_csv_export"] = False
     
     try:
-        settings["match_singltons"]
+        settings["match_singletons"]
     except Exception as e:
-        settings["match_singltons"] = 1
+        settings["match_singletons"] = 1
 
     try:
         int(settings["report_consensus_flanking_sequence"])

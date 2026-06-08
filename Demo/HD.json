@@ -9,7 +9,7 @@
 
 "grouping_repeat_units":["CAACAG", "CCGCCA","CAG", "CCG", "CCT"],
 
-"min_size_repeate": 5,
+"min_size_repeat": 5,
 
 "max_interrupt_tract": 5,
 

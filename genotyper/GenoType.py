@@ -36,7 +36,7 @@ class Genotype():
             
         self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
         self.reads = reads
-        self.min_size_repeate = self.settings["min_size_repeate"]
+        self.min_size_repeat = self.settings["min_size_repeat"]
         self.max_interrupt_tract = self.settings["max_interrupt_tract"]
         self.grouping_repeat_units = self.settings["grouping_repeat_units"]
         self.plot_3d_settings = self.settings["3D_plot_parameters"]
@@ -44,7 +44,7 @@ class Genotype():
         self.counts_table = {}
         self.unique_counts_table = {}
         self.table_3d = {}
-        if self.settings["match_singltons"]: self.before_matching_table = {}
+        if self.settings["match_singletons"]: self.before_matching_table = {}
         self.repeats = []
         self.genotype_repeats()
 
@@ -53,7 +53,7 @@ class Genotype():
         self.counts_table = {}
         self.unique_counts_table = {}
         self.table_3d = {}
-        if self.settings["match_singltons"]: self.before_matching_table = {}
+        if self.settings["match_singletons"]: self.before_matching_table = {}
 
     def genotype_repeats(self):
         genotyped_repeats = []
@@ -62,8 +62,8 @@ class Genotype():
                 genotyped_repeats.extend(self.get_line_repeates(read))
                    
 
-        if self.settings["match_singltons"]:
-            filtered_repeats = self.match_singltons(genotyped_repeats)         
+        if self.settings["match_singletons"]:
+            filtered_repeats = self.match_singletons(genotyped_repeats)         
             self.repeats = filtered_repeats
         else:
             self.repeats = genotyped_repeats
@@ -73,7 +73,7 @@ class Genotype():
                 repeat.discarded = False
                 self.add_repeat_to_tables(repeat)        
 
-    def match_singltons(self, genotyped_repeats):
+    def match_singletons(self, genotyped_repeats):
         self.clear_tables()
         for repeat in genotyped_repeats:
             self.add_repeat_to_genotable(repeat)
@@ -97,7 +97,7 @@ class Genotype():
                 continue
             else:
                 seq = next(
-                    (seq for n in range(self.settings["match_singltons"])
+                    (seq for n in range(self.settings["match_singletons"])
                         for seq in good_sequences_sorted
                         if Repeat.levenshtein(seq, repeat.get_seq()) == n + 1),
                     None
@@ -154,14 +154,14 @@ class Genotype():
                     i += 1
                     continue
                 #if length is larger than max interrupt tract
-                elif repeat.number_of_units >= self.min_size_repeate: #check that number of repeates is larger than the minimum size repeate
+                elif repeat.number_of_units >= self.min_size_repeat: #check that number of repeates is larger than the minimum size repeate
                     read.repeats.append(repeat)
                     if read.successfully_extracted:
                         genotyped_repeats.append(repeat)
                 repeat = None
             i +=1 
 
-        if repeat != None and repeat.number_of_units >= self.min_size_repeate: #if sequence ends on a repeat
+        if repeat != None and repeat.number_of_units >= self.min_size_repeat: #if sequence ends on a repeat
             read.repeats.append(repeat)
             if read.successfully_extracted:
                 genotyped_repeats.append(repeat)
