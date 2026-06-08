@@ -8,7 +8,12 @@ def check_input_directory(input_directory):
         print('invalid input directory')
         sys.exit()
     
-    samples = glob.glob(input_directory + "/*.fastq")
+    compressed = glob.glob(f"{input_directory}/*.fastq.gz")
+    samples = compressed + [
+        f for f in glob.glob(f"{input_directory}/*.fastq")
+        if f + ".gz" not in compressed
+    ]
+
     if len(samples)==0:
         print('no fastq files found in the input directory')
         sys.exit()

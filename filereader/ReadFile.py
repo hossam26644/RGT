@@ -1,4 +1,5 @@
 '''docstring'''
+import gzip
 from genotyper.Repeat import Read
 
 class ReadFile():
@@ -18,8 +19,10 @@ class ReadFile():
 
     def get_reads(self, file_name):
         reads = []
+        
+        opener = gzip.open if file_name.endswith(".gz") else open
 
-        with open(file_name, "r") as f:
+        with opener(file_name, "rt") as f:  # "rt" = read text
             while True:
                 header = f.readline()
                 if not header:

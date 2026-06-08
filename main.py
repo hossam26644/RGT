@@ -32,7 +32,12 @@ def main():
     and exports the summative result in an excel file
     '''
     input_directory, output_directory, settings, number_of_threads = get_user_inputs(sys.argv[1:])
-    samples = glob.glob(input_directory + "/*.fastq")
+    compressed = glob.glob(f"{input_directory}/*.fastq.gz")
+    samples = compressed + [
+        f for f in glob.glob(f"{input_directory}/*.fastq")
+        if f + ".gz" not in compressed
+    ]
+
     rgt_ = RGT(settings, input_directory, output_directory)
 
     if number_of_threads == None:
