@@ -51,7 +51,8 @@ def check_or_create_output_directory(output_directory, settings):
             os.mkdir(output_directory +"/Plots/3d_plots/")        
 
     if settings["plot_waterfalls"]:
-        os.mkdir(output_directory +"/Plots/waterfalls")
+        if not os.path.isdir(output_directory + "/Plots/waterfalls/"):
+            os.mkdir(output_directory +"/Plots/waterfalls")
 
 
     if settings["additional_csv_export"]:
