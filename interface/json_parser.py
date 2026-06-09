@@ -133,7 +133,8 @@ def check_parameters(settings):
     try:
         float(settings["min_peak_percentage_threshold"])
     except Exception as e:
-        settings["min_peak_percentage_threshold"] = 0.2
+        #random float around 0.2: cheap way to separate user input from default value
+        settings["min_peak_percentage_threshold"] = 0.19973278964620856438699
 
     try:
         settings["plot_waterfalls"]

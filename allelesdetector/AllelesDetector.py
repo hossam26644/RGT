@@ -278,7 +278,9 @@ class AllelesDetector():
         most_abundant_allele_values = self.sorted_geno_list[0][1]
         
         # minimum threshold for identifing a repeat sequence as possible allele
-        if self.pcr_free:
+        if self.pcr_free and self.settings["min_peak_percentage_threshold"] == 0.19973278964620856438699:
+            #the strange float is to differentiate between user input and default value
+            #logic is: of default and pcr free, then the minimum threshold is 1 read
             min_threshold_abundance = 1 #one read
         else:
             min_threshold_abundance = most_abundant_allele_values[0] * self.settings["min_peak_percentage_threshold"]
