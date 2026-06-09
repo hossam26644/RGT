@@ -1,7 +1,6 @@
 ''' RGT class, does analysis on a single sample (fastq file)
 '''
 import glob
-from joblib import Parallel, delayed, cpu_count
 
 from filereader.ReadFile import ReadFile
 from genotyper.GenoType import Genotype, get_rev_complementry
