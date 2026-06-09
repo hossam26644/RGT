@@ -1,3 +1,9 @@
+"""
+This code is adapted from https://github.com/MoncktonLab/MoncktonWaterfall
+which is adapted from:  https://github.com/PacificBiosciences/apps-scripts/blob/master/RepeatAnalysisTools/waterfall.py
+Credit to: Michael Wood and Nathalie Ridgillova
+"""
+
 import re
 import hashlib
 import colorsys
@@ -89,18 +95,10 @@ def draw_waterfall(
     Parameters
     ----------
     reads             : list of forward-strand sequences (str)
-    settings          : {
-                          "repeat_units" : list[str]   (optional),
-                          "title"        : str          (optional),
-                          "dpi"          : int          (default 400),
-                          "format"       : str          (default "png"),
-                          "filename"     : str          (default "waterfall"),
-                        }
+    settings          : user settings dict
+    title             : string sampleID
     export_directory  : path string for output
 
-    Returns
-    -------
-    raster : np.ndarray, shape (n_reads, max_read_len, 3)
     """
     if not reads:
         raise ValueError("reads list is empty")
