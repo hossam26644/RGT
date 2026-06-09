@@ -38,7 +38,7 @@ class RGT():
             ad = AllelesDetector(genotype, self.settings)
 
             if self.settings['discard_reads_with_no_end_flank'] == 'smart':
-                # reinclude reads with no end flank if the have more repeats than the longer allele
+                # reinclude reads with no end flank if they have more repeats than the longer allele
                 max_detected_expanded = 0
                 for read in file.reads:
                     for repeat in read.repeats:
