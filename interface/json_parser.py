@@ -62,9 +62,9 @@ def check_parameters(settings):
         settings["grouping_repeat_units"] = None
     
     try:
-        settings["min_size_repeate"]
+        settings["min_size_repeat"]
     except Exception as e:
-        settings["min_size_repeate"] = 5
+        settings["min_size_repeat"] = 5
 
     try:
         settings["max_interrupt_tract"]
@@ -73,10 +73,10 @@ def check_parameters(settings):
 
     try:
         settings["discard_reads_with_no_end_flank"]
-        settings["discard_reads_with_no_end_flank"] = get_bool_value_from_string(settings["discard_reads_with_no_end_flank"])
-        
+        if settings["discard_reads_with_no_end_flank"] != "smart":
+            settings["discard_reads_with_no_end_flank"] = get_bool_value_from_string(settings["discard_reads_with_no_end_flank"])
     except Exception as e:
-        settings["discard_reads_with_no_end_flank"] = False
+        settings["discard_reads_with_no_end_flank"] = "smart"
     try:
         int(settings["discarded_reads_flag_percentage"])
     except Exception as e:
@@ -87,14 +87,60 @@ def check_parameters(settings):
     except Exception as e:
         settings["reverse_strand"] = False
     try:
+        settings["PCR_free"]
+        settings["PCR_free"] = get_bool_value_from_string(settings["PCR_free"])
+    except Exception as e:
+        settings["PCR_free"] = False
+
+    try:
     	settings["minimum_no_of_reads"]
     except Exception as e:
-    	settings["minimum_no_of_reads"] = 30
+        if settings["PCR_free"] == True:
+            settings["minimum_no_of_reads"] = 1
+        else:
+            settings["minimum_no_of_reads"] = 30
+    try:
+        settings["number_of_allowed_strt_flank_point_mutations"]
+    except Exception as e:
+        settings["number_of_allowed_strt_flank_point_mutations"] = 1
+    try:
+        settings["number_of_allowed_end_flank_point_mutations"]
+    except Exception as e:
+        settings["number_of_allowed_end_flank_point_mutations"] = 1
 
     try:
         settings["3D_plot_parameters"]
         check_3d_plot_params(settings["3D_plot_parameters"])
     except Exception as e:
         settings["3D_plot_parameters"] = None
+
+    try:
+        settings["additional_csv_export"]
+        settings["additional_csv_export"] = get_bool_value_from_string(settings["additional_csv_export"])
+    except Exception as e:
+        settings["additional_csv_export"] = False
     
+    try:
+        settings["match_singletons"]
+    except Exception as e:
+        settings["match_singletons"] = 1
+
+    try:
+        int(settings["report_consensus_flanking_sequence"])
+    except Exception as e:
+        settings["report_consensus_flanking_sequence"] = False
+    
+    try:
+        float(settings["min_peak_percentage_threshold"])
+    except Exception as e:
+        #random float around 0.2: cheap way to separate user input from default value
+        settings["min_peak_percentage_threshold"] = 0.19973278964620856438699
+
+    try:
+        settings["plot_waterfalls"]
+        settings["plot_waterfalls"] = get_bool_value_from_string(settings["plot_waterfalls"])
+    except Exception as e:
+        settings["plot_waterfalls"] = False
+
+
     print(settings)
