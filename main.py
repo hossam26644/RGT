@@ -8,6 +8,8 @@ this is done by creating multible instances of the RGT class that does the
 analysis for each file
 
 '''
+import multiprocessing
+multiprocessing.freeze_support()
 import sys
 import glob
 from concurrent.futures import ProcessPoolExecutor, as_completed
