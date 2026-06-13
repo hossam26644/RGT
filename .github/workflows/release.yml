@@ -61,6 +61,8 @@ jobs:
 
       - name: Rename artifacts
         run: |
+          chmod +x artifacts/build-ubuntu-latest/* || true
+          chmod +x artifacts/build-macos-latest/* || true
           mv artifacts/build-ubuntu-latest/* artifacts/build-ubuntu-latest/RGT_linux || true
           mv artifacts/build-macos-latest/* artifacts/build-macos-latest/RGT_macos || true
 

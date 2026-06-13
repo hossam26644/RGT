@@ -25,9 +25,15 @@ a = Analysis(
     hiddenimports=(
         matplotlib_hidden + numpy_hidden + pandas_hidden
         + collect_submodules('matplotlib.backends')
+        + collect_submodules('concurrent')
+        + collect_submodules('multiprocessing')
         + [
             'matplotlib.backends.backend_agg',
             'matplotlib.backends._backend_agg',
+            'concurrent.futures',
+            'concurrent.futures._base',
+            'concurrent.futures.thread',
+            'concurrent.futures.process',
         ]
     ),
     hookspath=[],
