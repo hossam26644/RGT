@@ -52,7 +52,7 @@ class Read():
    
 class Repeat(Read):
     """docstring for Genotype"""
-    def __init__(self, read):
+    def __init__(self, read, plot_3d_settings):
 
         for k, v in read.state().items():
             setattr(self, k, v)
@@ -68,7 +68,7 @@ class Repeat(Read):
         self.unconfirmed_sequence = "" #sequence of non pure repeates waiting for a confirmed unit to  be added
         self.unique_repeat_units_list = None
         self.unique_repeat_units_count = 0
-        self.plot_3d_settings = None
+        self.plot_3d_settings = plot_3d_settings
         self.discarded = True
         #for 3D plots
         if self.plot_3d_settings is not None:

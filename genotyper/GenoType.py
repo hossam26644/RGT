@@ -127,7 +127,7 @@ class Genotype():
             checker = self.window_enters_repeat_sequence(i, self.repeat_units, repeat, read.interflanking_seq)
             if checker[0]:
                 '''if window detects a repeat unit, while it is not inside a repeat sequence'''
-                repeat = Repeat(read)
+                repeat = Repeat(read, self.settings["3D_plot_parameters"])
                 window = checker[1]
                 repeat.start_index = i
                 repeat.last_unit_index = i+len(window)
