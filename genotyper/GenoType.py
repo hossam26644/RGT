@@ -35,6 +35,8 @@ class Genotype():
             self.unique_repeat_units = self.settings["unique_repeat_units"]
             
         self.list_of_repeat_units_lengths = self.get_list_of_repeat_units_lengths()#used to have diff sliding windows lengths
+        self.repeat_units_set = set(self.repeat_units)
+        self.one_mismatch_keys = {(p, u[:p] + u[p+1:]) for u in self.repeat_units for p in range(len(u))}
         self.reads = reads
         self.min_size_repeat = self.settings["min_size_repeat"]
         self.max_interrupt_tract = self.settings["max_interrupt_tract"]
@@ -85,28 +87,32 @@ class Genotype():
         ]
         # reverse lookup: sequence_str -> key
         seq_to_key = {v[5]: k for k, v in geno_table.items()}
+        good_sequences_set = set(good_sequences_sorted)
+        first_repeat_by_seq = {}
+        for r in genotyped_repeats:
+            first_repeat_by_seq.setdefault(r.get_seq(), r)
 
         filtered_matched_repeats = []
         for repeat in genotyped_repeats:
             abuncance = geno_table.get(repeat.get_seq_smart_string(self.reverse_strand))
-            if repeat.get_seq() in good_sequences_sorted:
+            if repeat.get_seq() in good_sequences_set:
                 filtered_matched_repeats.append(repeat)
                 continue
             elif abuncance is not None and abuncance[0] > 1:
                 filtered_matched_repeats.append(repeat)
                 continue
             else:
+                # distance >= length difference; with score_cutoff=n+1 a distance > n+1 is reported as n+2
+                target = repeat.get_seq()
                 seq = next(
                     (seq for n in range(self.settings["match_singletons"])
                         for seq in good_sequences_sorted
-                        if Repeat.levenshtein(seq, repeat.get_seq()) == n + 1),
+                        if abs(len(seq) - len(target)) <= n + 1
+                        and Repeat.levenshtein(seq, target, score_cutoff=n + 1) == n + 1),
                     None
                 )
 
-                aligned_to_repeat = next(
-                    (r for r in genotyped_repeats if r.get_seq() == seq),
-                    None
-                )
+                aligned_to_repeat = first_repeat_by_seq.get(seq)
                 if aligned_to_repeat is None:
                     filtered_matched_repeats.append(repeat)
                 else:
@@ -193,15 +199,16 @@ class Genotype():
         return False, ""
 
     def do_repeat_unit_exist(self,idx,repeat_object,sequence):
+        # An exact unit (any length) wins; else the first window one mismatch from a same-length unit.
+        # Hamming(w, u) <= 1 at p  <=>  (p, w minus p) == (p, u minus p); exact units are already excluded.
         similar_seq = ""
         for length in self.list_of_repeat_units_lengths:
             window = sequence[idx:idx+length]
-            for repeat_unit in self.repeat_units:
-                if window == repeat_unit:
-                    return True, window
-                elif repeat_object != None and Repeat.hamming_distance(window, repeat_unit)==1:
-                    if similar_seq == "":
-                        similar_seq = window
+            if window in self.repeat_units_set:
+                return True, window
+            if repeat_object != None and similar_seq == "" and any(
+                    (p, window[:p] + window[p+1:]) in self.one_mismatch_keys for p in range(len(window))):
+                similar_seq = window
         if similar_seq != "":
             return True, similar_seq
         return False, ""

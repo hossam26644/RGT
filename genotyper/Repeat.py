@@ -1,7 +1,20 @@
 '''docstring'''
+from functools import lru_cache
+from rapidfuzz.distance import Levenshtein
 from .SmartString import SmartString
 from .GroupingString import GroupingString
 from .revComplementry import get_rev_complementry
+
+
+# Pure functions of their arguments; reads of the same allele share a sequence.
+@lru_cache(maxsize=None)
+def cached_smart_string(sequence, repeat_units):
+    return SmartString.get_smart_string_from_sequence(sequence, 3, repeat_units)
+
+
+@lru_cache(maxsize=None)
+def cached_grouped_string(sequence, grouping_units):
+    return GroupingString.get_grouped_string_from_sequence(sequence, grouping_units)
 
 class Read():
     def __init__(self, header=None, raw_read=None, quality_score=None):
@@ -40,14 +53,8 @@ class Read():
         return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
     @staticmethod
-    def levenshtein(a: str, b: str) -> int:
-        m, n = len(a), len(b)
-        dp = list(range(n + 1))
-        for i, ca in enumerate(a, 1):
-            prev, dp[0] = dp[0], i
-            for j, cb in enumerate(b, 1):
-                prev, dp[j] = dp[j], min(dp[j] + 1, dp[j-1] + 1, prev + (ca != cb))
-        return dp[n]
+    def levenshtein(a: str, b: str, score_cutoff=None) -> int:
+        return Levenshtein.distance(a, b, score_cutoff=score_cutoff)
 
    
 class Repeat(Read):
@@ -164,17 +171,17 @@ class Repeat(Read):
     def get_seq_smart_string(self, rev_strand):
         if rev_strand:
             reversed_seq = get_rev_complementry(self.get_seq())
-            smart_string = SmartString.get_smart_string_from_sequence(reversed_seq, 3, self.repeat_units)
+            smart_string = cached_smart_string(reversed_seq, tuple(self.repeat_units))
         else:
-            smart_string = SmartString.get_smart_string_from_sequence(self.get_seq(), 3, self.repeat_units)
+            smart_string = cached_smart_string(self.get_seq(), tuple(self.repeat_units))
         return smart_string
 
     def get_grouped_string(self, grouping_repeat_units, rev_strand):
         if rev_strand:
             reversed_seq = get_rev_complementry(self.get_seq())
-            grouping_string = GroupingString.get_grouped_string_from_sequence(reversed_seq, grouping_repeat_units)
+            grouping_string = cached_grouped_string(reversed_seq, tuple(grouping_repeat_units))
         else:
-            grouping_string = GroupingString.get_grouped_string_from_sequence(self.get_seq(), grouping_repeat_units)
+            grouping_string = cached_grouped_string(self.get_seq(), tuple(grouping_repeat_units))
         return grouping_string
         
     def __eq__(self, other):

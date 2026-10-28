@@ -43,10 +43,18 @@ class ReadFile():
         sf_len, ef_len = len(self.start_flank), len(self.end_flank)
         max_sd, max_ed = self.number_of_allowed_strt_flank_point_mutations, self.number_of_allowed_end_flank_point_mutations
         rr = read.raw_read
+        start_widths = sorted(range(sf_len - max_sd, sf_len + max_sd + 1), key=lambda x: abs(x - sf_len))
+        end_widths = sorted(range(ef_len - max_ed, ef_len + max_ed + 1), key=lambda x: abs(x - ef_len))
 
+        # The first exact flank occurrence is what each scan below returns (d = 0 is unbeatable, so the
+        # scan then stops after one pass). The start scan never tests windows ending at len(rr).
         best_sd, seq_start_index, start_flank_start = max_sd + 1, -1, -1
+        exact = rr.find(self.start_flank)
+        if exact != -1 and exact + sf_len < len(rr):
+            best_sd, seq_start_index, start_flank_start = 0, exact + sf_len, exact
+            read.start_flank_found = True
         for i in range(len(rr)):
-            for w in sorted(range(sf_len - max_sd, sf_len + max_sd + 1), key=lambda x: abs(x - sf_len)):
+            for w in start_widths:
                 j = i - w
                 if j < 0: continue
                 if abs(w - sf_len) >= best_sd: continue
@@ -62,8 +70,12 @@ class ReadFile():
             return
 
         best_ed, seq_end_index, end_flank_end = max_ed + 1, -1, -1
+        exact = rr.find(self.end_flank, seq_start_index)
+        if exact != -1 and exact < len(rr):
+            best_ed, seq_end_index, end_flank_end = 0, exact, exact + ef_len
+            read.end_flank_found = True
         for i in range(seq_start_index, len(rr)):
-            for w in sorted(range(ef_len - max_ed, ef_len + max_ed + 1), key=lambda x: abs(x - ef_len)):
+            for w in end_widths:
                 if i + w > len(rr): continue
                 if abs(w - ef_len) >= best_ed: continue
                 d = Read.levenshtein(rr[i:i + w], self.end_flank)
