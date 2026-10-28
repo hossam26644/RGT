@@ -131,6 +131,6 @@ def draw_waterfall(
 
     plt.tight_layout()
     out = export_directory
-    fig.savefig(out, dpi=400, format="png", bbox_inches='tight')
+    fig.savefig(out, dpi=300, format="png", bbox_inches='tight')
     plt.close(fig)
 

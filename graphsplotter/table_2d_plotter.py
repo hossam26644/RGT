@@ -67,6 +67,6 @@ def plot_2d_table(table, export_directory, sample_code, first_allele, second_all
     except:
         pass
 
-    plt.savefig(export_directory, dpi=600)
+    plt.savefig(export_directory, dpi=300)
     plt.clf()
     plt.close()

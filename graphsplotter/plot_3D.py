@@ -75,6 +75,6 @@ def plot_3D(table, export_directory, sample_code, first_allele, second_allele,
 
     plt.autoscale(enable=True, axis='both', tight=True)
     #plt.show()
-    plt.savefig(export_directory, dpi=600)
+    plt.savefig(export_directory, dpi=300)
     plt.clf()
     plt.close()
